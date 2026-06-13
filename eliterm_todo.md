@@ -87,21 +87,21 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] rsync プログレスバー表示
 
 ### 1.6 Quantum（cron）統合
-- [ ] `Eliterm.CronManager` GenServer の実装
-- [ ] `home/crontab` の読み込み・パース
-- [ ] `# name:` コメント規約のパース実装（名前なし行は `job_1`, `job_2` と自動採番）
-- [ ] Quantum へのジョブ動的登録
-- [ ] `@reboot` ジョブのマイグレート先での自動実行
-- [ ] `#!/bin/sh` スクリプトを `bash --posix` で実行する設定
-- [ ] crontab の `~` を `home/` パスに解決する処理
-- [ ] Quantum の起動・停止制御
-- [ ] `eliterm list jobs` — ジョブ定義一覧表示（スケジュール・有効/無効・前回/次回実行）
-- [ ] `eliterm list procs` — 実行中ジョブ一覧表示
-- [ ] `eliterm job run <name>` — ジョブ手動実行
-- [ ] `eliterm job disable <name>` — ジョブ一時停止
-- [ ] `eliterm job enable <name>` — ジョブ再開
-- [ ] `eliterm job log <name> [--lines <n>]` — ジョブ実行ログ表示
-- [ ] ジョブ実行ログの `sync.log` への記録
+- [x] `Eliterm.CronManager` GenServer の実装
+- [x] `home/crontab` の読み込み・パース
+- [x] `# name:` コメント規約のパース実装（名前なし行は `job_1`, `job_2` と自動採番）
+- [x] Quantum へのジョブ動的登録
+- [x] `@reboot` ジョブのマイグレート先での自動実行
+- [x] `#!/bin/sh` スクリプトを `bash --posix` で実行する設定
+- [x] crontab の `~` を `home/` パスに解決する処理
+- [x] Quantum の起動・停止制御
+- [x] `eliterm list jobs` — ジョブ定義一覧表示（スケジュール・有効/無効・前回/次回実行）
+- [x] `eliterm list procs` — 実行中ジョブ一覧表示
+- [x] `eliterm job run <name>` — ジョブ手動実行
+- [x] `eliterm job disable <name>` — ジョブ一時停止
+- [x] `eliterm job enable <name>` — ジョブ再開
+- [x] `eliterm job log <name> [--lines <n>]` — ジョブ実行ログ表示
+- [x] ジョブ実行ログの `sync.log` への記録
 
 ### 1.7 マイグレーション
 - [ ] `Eliterm.ClusterManager` へのマイグレーションフロー実装

@@ -42,3 +42,9 @@
   - `rsync_copy/3` で `--info=progress2` を用いたプログレス付きディレクトリ転送を実装。
   - `verify_checksum/1` にて `tar | shasum` を用いた高速かつパーミッション考慮のチェックサム機能を追加。
 
+- Phase 1.6: Quantum（cron）統合機能の実装を完了しました。
+  - `Eliterm.Scheduler` および `Eliterm.CronManager` の実装と `application.ex` への組み込み。
+  - `crontab` のカスタムパース (`# name:` 対応、`~` の `home/` 置換) を実装。
+  - Quantum へのジョブの動的追加・有効化・無効化のAPI基盤を追加。
+  - `bash --posix` を用いたジョブ実行と、`sync.log` への標準出力および終了コードの記録を実装。
+

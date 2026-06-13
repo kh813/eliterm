@@ -14,6 +14,7 @@ defmodule Eliterm.Application do
     ]
 
     children = [
+      Eliterm.Scheduler,
       {Cluster.Supervisor, [topologies, [name: Eliterm.ClusterSupervisor]]},
       {Horde.Registry, [name: Eliterm.Registry, keys: :unique, members: :auto]},
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},

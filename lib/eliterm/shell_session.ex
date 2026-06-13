@@ -24,8 +24,8 @@ defmodule Eliterm.ShellSession do
     end)
 
     children = [
-      {Eliterm.PTY, [session_id: session_id, home_dir: home_dir]}
-      # {Eliterm.CronManager, [session_id: session_id, home_dir: home_dir]}
+      {Eliterm.PTY, [session_id: session_id, home_dir: home_dir]},
+      {Eliterm.CronManager, [session_id: session_id, home_dir: home_dir]}
     ]
 
     Supervisor.init(children, strategy: :one_for_all)
