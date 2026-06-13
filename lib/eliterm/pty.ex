@@ -54,6 +54,35 @@ defmodule Eliterm.PTY do
       {"TERM", "xterm-256color"}
     ]
 
+    session_dir = Path.join([home_dir, "..", ".session"]) |> Path.expand()
+    snapshot = Eliterm.SessionSnapshot.load(session_dir)
+
+    bash_args = []
+    cwd = home_dir
+    
+    env_map = Map.new(env)
+    
+    {bash_args, cwd, env_map} =
+      if snapshot do
+        s_cwd = Path.join(home_dir, snapshot.cwd)
+        s_env_map = Map.merge(env_map, snapshot.env)
+        
+        restore_rc = Path.join(session_dir, "restore.rc")
+        File.write!(restore_rc, """
+        source ~/.bashrc
+        #{snapshot.shell_vars}
+        #{snapshot.aliases}
+        rm #{restore_rc}
+        """)
+        
+        File.rm(Path.join(session_dir, "snapshot.json"))
+        {["--rcfile", restore_rc], s_cwd, s_env_map}
+      else
+        {bash_args, cwd, env_map}
+      end
+    
+    env = Enum.map(env_map, fn {k, v} -> {k, v} end)
+
     me = self()
 
     on_data = fn _pty, _os_pid, data ->
@@ -64,9 +93,9 @@ defmodule Eliterm.PTY do
       send(me, {:pty_exit, exit_code})
     end
 
-    {:ok, pty} = ExPTY.spawn(bash_path, [],
+    {:ok, pty} = ExPTY.spawn(bash_path, bash_args,
       env: env,
-      cwd: home_dir,
+      cwd: cwd,
       name: "xterm-256color",
       cols: 80,
       rows: 24,
