@@ -45,6 +45,8 @@ jobs:
           & $csc /out:win_sleep_watcher.exe priv\win_sleep_watcher.cs
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
+        env:
+          ImageOS: win25
         with:
           elixir-version: '1.15.4'
           otp-version: '26.0'
