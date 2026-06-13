@@ -13,11 +13,27 @@ jobs:
       - uses: actions/checkout@v4
       - name: Compile Mac Sleep Watcher
         run: swiftc priv/mac_sleep_watcher.swift -o mac_sleep_watcher
-      - name: Upload Mac Artifact
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15.4'
+          otp-version: '26.0'
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Package macOS GUI
+        run: ./scripts/package_mac_gui.sh
+      - name: Create DMG
+        run: hdiutil create -volname Eliterm -srcfolder Eliterm.app -ov -format UDZO Eliterm-macOS.dmg
+      - name: Upload Mac Sleep Watcher
         uses: actions/upload-artifact@v4
         with:
           name: mac_sleep_watcher
           path: mac_sleep_watcher
+      - name: Upload Mac GUI
+        uses: actions/upload-artifact@v4
+        with:
+          name: Eliterm-macOS.dmg
+          path: Eliterm-macOS.dmg
 
   build-win:
     runs-on: windows-latest
@@ -27,11 +43,27 @@ jobs:
         run: |
           $csc = (Get-ChildItem -Path "C:\Windows\Microsoft.NET\Framework64" -Filter "csc.exe" -Recurse | Sort-Object LastWriteTime -Descending)[0].FullName
           & $csc /out:win_sleep_watcher.exe priv\win_sleep_watcher.cs
-      - name: Upload Windows Artifact
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15.4'
+          otp-version: '26.0'
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Package Windows GUI
+        run: .\scripts\package_win_gui.ps1
+      - name: Zip Windows GUI
+        run: Compress-Archive -Path Eliterm-Windows\* -DestinationPath Eliterm-Windows.zip
+      - name: Upload Windows Sleep Watcher
         uses: actions/upload-artifact@v4
         with:
           name: win_sleep_watcher.exe
           path: win_sleep_watcher.exe
+      - name: Upload Windows GUI
+        uses: actions/upload-artifact@v4
+        with:
+          name: Eliterm-Windows.zip
+          path: Eliterm-Windows.zip
 
   build-elixir:
     runs-on: ubuntu-latest
@@ -61,10 +93,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mac_sleep_watcher
+      - name: Download Mac GUI
+        uses: actions/download-artifact@v4
+        with:
+          name: Eliterm-macOS.dmg
       - name: Download Windows Artifact
         uses: actions/download-artifact@v4
         with:
           name: win_sleep_watcher.exe
+      - name: Download Windows GUI
+        uses: actions/download-artifact@v4
+        with:
+          name: Eliterm-Windows.zip
       - name: Download Elixir CLI
         uses: actions/download-artifact@v4
         with:
@@ -77,5 +117,7 @@ jobs:
             mac_sleep_watcher/mac_sleep_watcher
             win_sleep_watcher.exe/win_sleep_watcher.exe
             eliterm-cli/eliterm
+            Eliterm-macOS.dmg/Eliterm-macOS.dmg
+            Eliterm-Windows.zip/Eliterm-Windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

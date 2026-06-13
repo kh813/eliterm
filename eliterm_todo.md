@@ -201,8 +201,10 @@ Version 0.1 / 仕様書 v0.8 対応
 - [ ] LiveView ページの作成と `xterm.js` のフロントエンド統合
 - [ ] PTY (ExPTY) と LiveView の双方向 I/O 連携（Hooks 実装）
 - [x] メジャーカラースキームのプリセット対応と TOML カスタマイズ実装
-- [ ] デスクトップアプリとしてのウィンドウ管理（`elixir-desktop` 設定）
-- [ ] macOS および Windows 向けネイティブパッケージビルドの検証
+- [x] デスクトップアプリとしてのウィンドウ管理（`elixir-desktop` 設定）
+- [ ] macOS 向け `.app` バンドルおよび `.dmg` パッケージの自動構築処理
+- [ ] Windows 向け起動用ランチャー（`.exe`）および `.zip` パッケージの自動構築処理
+- [ ] GitHub Actions ワークフローにて CLI 版と GUI 版の両方をビルド・リリースする設定
 
 ---
 
