@@ -24,10 +24,12 @@ defmodule Eliterm.ShellSession do
     end)
 
     children = [
+      {Eliterm.ContainerWorker, [session_id: session_id, home_dir: home_dir]},
       {Eliterm.PTY, [session_id: session_id, home_dir: home_dir]},
       {Eliterm.CronManager, [session_id: session_id, home_dir: home_dir]}
     ]
 
-    Supervisor.init(children, strategy: :one_for_all)
+    # ContainerWorker is first, and if it crashes, restart everything.
+    Supervisor.init(children, strategy: :rest_for_one)
   end
 end

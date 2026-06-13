@@ -161,17 +161,22 @@ defmodule Eliterm.CronManager do
     end
   end
 
-  def execute_job(_session_id, job_name, command, home_dir) do
+  def execute_job(session_id, job_name, command, home_dir) do
     sync_log = Path.join([home_dir, "..", ".session", "sync.log"]) |> Path.expand()
     File.mkdir_p!(Path.dirname(sync_log))
     
     log_msg = "[#{DateTime.utc_now()}] [#{job_name}] START: #{command}\n"
     File.write!(sync_log, log_msg, [:append])
 
-    args = ["--posix", "-c", command]
-    env = [{"HOME", home_dir}]
+    args = [
+      "exec", 
+      "-w", "/home/user",
+      "-e", "HOME=/home/user",
+      "eliterm-#{session_id}", 
+      "bash", "--posix", "-c", command
+    ]
 
-    {output, exit_code} = System.cmd("bash", args, cd: home_dir, env: env, stderr_to_stdout: true)
+    {output, exit_code} = System.cmd("podman", args, stderr_to_stdout: true)
 
     log_msg_end = "[#{DateTime.utc_now()}] [#{job_name}] END: exit_code=#{exit_code}\nOutput:\n#{output}\n"
     File.write!(sync_log, log_msg_end, [:append])

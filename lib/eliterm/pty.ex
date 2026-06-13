@@ -57,28 +57,25 @@ defmodule Eliterm.PTY do
     session_dir = Path.join([home_dir, "..", ".session"]) |> Path.expand()
     snapshot = Eliterm.SessionSnapshot.load(session_dir)
 
-    bash_args = []
-    cwd = home_dir
-    
     env_map = Map.new(env)
     
     {bash_args, cwd, env_map} =
       if snapshot do
-        s_cwd = Path.join(home_dir, snapshot.cwd)
+        s_cwd = Path.join("/home/user", snapshot.cwd)
         s_env_map = Map.merge(env_map, snapshot.env)
         
-        restore_rc = Path.join(session_dir, "restore.rc")
+        restore_rc = Path.join(home_dir, ".restore.rc")
         File.write!(restore_rc, """
         source ~/.bashrc
         #{snapshot.shell_vars}
         #{snapshot.aliases}
-        rm #{restore_rc}
+        rm ~/.restore.rc
         """)
         
         File.rm(Path.join(session_dir, "snapshot.json"))
-        {["--rcfile", restore_rc], s_cwd, s_env_map}
+        {["--rcfile", "/home/user/.restore.rc"], s_cwd, s_env_map}
       else
-        {bash_args, cwd, env_map}
+        {[], "/home/user", env_map}
       end
     
     # No need to convert to list, ExPTY expects map
@@ -93,9 +90,14 @@ defmodule Eliterm.PTY do
       send(me, {:pty_exit, exit_code})
     end
 
-    {:ok, pty} = ExPTY.spawn(bash_path, bash_args,
-      env: env_map,
-      cwd: cwd,
+    podman_args = ["exec", "-it"]
+    env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
+    cwd_args = ["-w", cwd]
+    final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
+
+    {:ok, pty} = ExPTY.spawn("podman", final_args,
+      env: %{},
+      cwd: home_dir,
       name: "xterm-256color",
       cols: 80,
       rows: 24,
