@@ -2,15 +2,16 @@ let Hooks = {};
 
 Hooks.Terminal = {
   mounted() {
+    let colors = JSON.parse(this.el.dataset.colors || "{}");
     this.term = new window.Terminal({
       cursorBlink: true,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
       fontSize: 14,
-      theme: {
+      theme: Object.assign({
         background: 'transparent',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
-      }
+      }, colors)
     });
 
     this.fitAddon = new window.FitAddon.FitAddon();

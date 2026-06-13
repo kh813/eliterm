@@ -4,12 +4,25 @@ defmodule ElitermWeb.TerminalLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    colors = get_colors()
     if connected?(socket) do
       session = ensure_session()
       Phoenix.PubSub.subscribe(Eliterm.PubSub, "pty:#{session.id}")
-      {:ok, assign(socket, session_id: session.id)}
+      {:ok, assign(socket, session_id: session.id, colors: colors)}
     else
-      {:ok, assign(socket, session_id: "default")}
+      {:ok, assign(socket, session_id: "default", colors: colors)}
+    end
+  end
+
+  defp get_colors do
+    path = Path.join([System.user_home!(), ".eliterm", "eliterm.toml"])
+    if File.exists?(path) do
+      case Toml.decode(File.read!(path)) do
+        {:ok, parsed} -> get_in(parsed, ["gui", "colors"]) || %{}
+        _ -> %{}
+      end
+    else
+      %{}
     end
   end
 

@@ -200,7 +200,7 @@ Version 0.1 / 仕様書 v0.8 対応
 - [ ] Phoenix アプリケーション基盤のセットアップ（Endpoint, Router 等）
 - [ ] LiveView ページの作成と `xterm.js` のフロントエンド統合
 - [ ] PTY (ExPTY) と LiveView の双方向 I/O 連携（Hooks 実装）
-- [ ] メジャーカラースキームのプリセット対応と TOML カスタマイズ実装
+- [x] メジャーカラースキームのプリセット対応と TOML カスタマイズ実装
 - [ ] デスクトップアプリとしてのウィンドウ管理（`elixir-desktop` 設定）
 - [ ] macOS および Windows 向けネイティブパッケージビルドの検証
 

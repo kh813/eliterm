@@ -14,7 +14,7 @@
     
     <!-- Terminal Container -->
     <div class="flex-1 p-4 bg-black/60 relative">
-      <div id="terminal" phx-update="ignore" phx-hook="Terminal" class="w-full h-full"></div>
+      <div id="terminal" phx-update="ignore" phx-hook="Terminal" data-colors={Jason.encode!(@colors)} class="w-full h-full"></div>
     </div>
   </div>
 </div>
