@@ -49,22 +49,22 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] Erlang Distribution の TLS 設定
 
 ### 1.3 PTY・bash セッション
-- [ ] `Eliterm.PTY` GenServer の実装（ExPTY ラッパー）
-- [ ] bash 起動時の環境設定（`HOME=home/`・`SHELL` パス・`bash --norc` オプション検討）
-- [ ] `.bashrc` のロード設定
-- [ ] PTY リサイズ対応（`SIGWINCH` ハンドリング）
-- [ ] Unix socket 経由のクライアント接続実装
-- [ ] デーモン起動・バックグラウンド化の実装（`mix release` + `--no-halt`）
-- [ ] PID ファイル管理（`~/.eliterm/eliterm.pid`）
-- [ ] `eliterm stop --daemon` — デーモン本体の停止実装
-- [ ] `eliterm start` 時のデーモン起動済みチェック
-- [ ] `eliterm start --headless` — セッション起動（ヘッドレスモード）
-- [ ] `eliterm attach [<session-id>]` — セッションへのアタッチ
-- [ ] `eliterm detach` — セッションのデタッチ
-- [ ] `eliterm stop [<session-id>]` — セッション停止
-- [ ] `eliterm list sessions` — セッション一覧表示
-- [ ] `eliterm session info <session-id>` — セッション詳細表示
-- [ ] `eliterm session rename <old> <new>` — セッション名変更
+- [x] `Eliterm.PTY` GenServer の実装（ExPTY ラッパー）
+- [x] bash 起動時の環境設定（`HOME=home/`・`SHELL` パス・`bash --norc` オプション検討）
+- [x] `.bashrc` のロード設定
+- [x] PTY リサイズ対応（`SIGWINCH` ハンドリング）
+- [x] Unix socket 経由のクライアント接続実装
+- [x] デーモン起動・バックグラウンド化の実装（`mix release` + `--no-halt`）
+- [x] PID ファイル管理（`~/.eliterm/eliterm.pid`）
+- [x] `eliterm stop --daemon` — デーモン本体の停止実装
+- [x] `eliterm start` 時のデーモン起動済みチェック
+- [x] `eliterm start --headless` — セッション起動（ヘッドレスモード）
+- [x] `eliterm attach [<session-id>]` — セッションへのアタッチ
+- [x] `eliterm detach` — セッションのデタッチ
+- [x] `eliterm stop [<session-id>]` — セッション停止
+- [x] `eliterm list sessions` — セッション一覧表示
+- [x] `eliterm session info <session-id>` — セッション詳細表示
+- [x] `eliterm session rename <old> <new>` — セッション名変更
 
 ### 1.4 セッションスナップショット
 - [ ] `Eliterm.SessionSnapshot` 構造体の定義

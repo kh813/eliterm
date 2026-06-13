@@ -25,3 +25,8 @@
   - `libcluster` の戦略として Gossip を採用。
   - 将来の厳格なCA認証（v0.6）を仕様書ロードマップに追記。
 
+- Phase 1.3: PTY・bash セッションのコアロジックを実装しました。
+  - `Eliterm.PTY` にて `ExPTY` 経由での bash 起動・環境変数設定（HOME等）を実装。
+  - Unix Domain Socket 経由での送受信ロジック（PTYのI/Oプロキシ）を実装。
+  - `Eliterm.ShellSession` スーパーバイザーの作成と `start_session/2` のバックエンド機能を提供。
+
