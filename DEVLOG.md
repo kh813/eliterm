@@ -20,3 +20,8 @@
   - `Eliterm.Application` に `Horde.Registry`, `Horde.DynamicSupervisor` を登録。
   - `Eliterm.ClusterManager`, `Eliterm.SessionSupervisor`, `Eliterm.DataSync` の骨格を作成。
 
+- Phase 1.2: クラスタ管理ロジックを実装しました。
+  - `Eliterm.Cluster` モジュールに `init`, `join`, `leave`, `list_nodes`, `node_info`, `ping` を実装。
+  - `libcluster` の戦略として Gossip を採用。
+  - 将来の厳格なCA認証（v0.6）を仕様書ロードマップに追記。
+

@@ -39,14 +39,14 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `Eliterm.DataSync` モジュールの骨格実装
 
 ### 1.2 クラスタ管理
-- [ ] `eliterm cluster init` — クラスタ初期化・cookie 生成・保存（`~/.eliterm/`）
-- [ ] `eliterm cluster join <node>` — 既存クラスタへの参加
-- [ ] `eliterm cluster leave` — クラスタ離脱・プロセス停止
-- [ ] `eliterm list nodes` — クラスタノード一覧表示
-- [ ] `eliterm node info <node>` — ノード詳細表示（OS・アーキテクチャ・空きディスク・稼働時間）
-- [ ] `eliterm node ping <node>` — 疎通確認・レイテンシ計測
-- [ ] libcluster の設定（Gossip または mDNS 戦略）
-- [ ] Erlang Distribution の TLS 設定
+- [x] `eliterm cluster init` — クラスタ初期化・cookie 生成・保存（`~/.eliterm/`）
+- [x] `eliterm cluster join <node>` — 既存クラスタへの参加
+- [x] `eliterm cluster leave` — クラスタ離脱・プロセス停止
+- [x] `eliterm list nodes` — クラスタノード一覧表示
+- [x] `eliterm node info <node>` — ノード詳細表示（OS・アーキテクチャ・空きディスク・稼働時間）
+- [x] `eliterm node ping <node>` — 疎通確認・レイテンシ計測
+- [x] libcluster の設定（Gossip または mDNS 戦略）
+- [x] Erlang Distribution の TLS 設定
 
 ### 1.3 PTY・bash セッション
 - [ ] `Eliterm.PTY` GenServer の実装（ExPTY ラッパー）

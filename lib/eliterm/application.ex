@@ -7,7 +7,14 @@ defmodule Eliterm.Application do
 
   @impl true
   def start(_type, _args) do
+    topologies = [
+      eliterm_cluster: [
+        strategy: Cluster.Strategy.Gossip
+      ]
+    ]
+
     children = [
+      {Cluster.Supervisor, [topologies, [name: Eliterm.ClusterSupervisor]]},
       {Horde.Registry, [name: Eliterm.Registry, keys: :unique, members: :auto]},
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},
       Eliterm.ClusterManager,
