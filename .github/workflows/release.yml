@@ -13,11 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Compile Mac Sleep Watcher
         run: swiftc priv/mac_sleep_watcher.swift -o mac_sleep_watcher
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: '1.15.4'
-          otp-version: '26.0'
+      - name: Set up Elixir (brew)
+        run: brew install erlang elixir
       - name: Install dependencies
         run: mix deps.get
       - name: Package macOS GUI
