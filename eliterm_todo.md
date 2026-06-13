@@ -177,8 +177,9 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `eliterm.toml` への自動マイグレーション設定（`target_node`）追加
 - [x] スリープ検知時の自動全セッションマイグレートフローの統合
 - [ ] Linux 向けスリープ検知（`systemd-inhibit`）の実装
-- [ ] Windows 向けスリープ検知（C# / PowerShell）の実装
-- [ ] Windows 向けインストールスクリプト（`install.ps1`）の作成
+- [x] Windows 向けスリープ検知ヘルパー（C#）の実装
+- [x] Windows 向けインストールスクリプト（`install.ps1`）の作成
+- [x] Windows 上での `Eliterm.SleepWatcher` 統合
 - [ ] ノードオフライン時の自動フェイルオーバー（将来拡張）
 
 ---

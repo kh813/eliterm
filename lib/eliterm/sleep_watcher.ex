@@ -8,17 +8,24 @@ defmodule Eliterm.SleepWatcher do
 
   @impl true
   def init(_opts) do
-    if match?({:unix, :darwin}, :os.type()) do
-      bin_path = Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher"])
-      if File.exists?(bin_path) do
-        Logger.info("Starting SleepWatcher port...")
-        port = Port.open({:spawn_executable, bin_path}, [:binary, :exit_status, line: 256])
-        {:ok, %{port: port, status: :ready}}
-      else
-        Logger.warning("Sleep watcher binary not found at #{bin_path}")
+    case :os.type() do
+      {:unix, :darwin} ->
+        start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher"]))
+      {:win32, :nt} ->
+        start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher.exe"]))
+      _ ->
+        Logger.info("SleepWatcher is not supported on this OS yet.")
         :ignore
-      end
+    end
+  end
+
+  defp start_port(bin_path) do
+    if File.exists?(bin_path) do
+      Logger.info("Starting SleepWatcher port...")
+      port = Port.open({:spawn_executable, bin_path}, [:binary, :exit_status, line: 256])
+      {:ok, %{port: port, status: :ready}}
     else
+      Logger.warning("Sleep watcher binary not found at #{bin_path}")
       :ignore
     end
   end
