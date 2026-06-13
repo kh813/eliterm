@@ -61,3 +61,8 @@
   - `Eliterm.CLI` にて、裏側で動作するバックグラウンドデーモンに対するローカルRPCクライアントを実装。
   - cluster, list, session, job, migrate 操作を一通りサポート。
 
+- Phase 2: 検証・安定化フェーズを完了しました。
+  - `test_e2e.sh` を作成し、2つのローカルノード間でのクラスタ接続とマイグレーションが正常に動作することを確認。
+  - `install.sh` を作成し、`escript` でビルドした `eliterm` コマンドのインストールと `PATH` の自動設定を追加。
+  - プロトコルを Unix Domain Socket、rsyncプログレスを `--info=progress2` で標準出力に流す方針で確定。
+

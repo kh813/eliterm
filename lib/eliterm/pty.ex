@@ -81,7 +81,7 @@ defmodule Eliterm.PTY do
         {bash_args, cwd, env_map}
       end
     
-    env = Enum.map(env_map, fn {k, v} -> {k, v} end)
+    # No need to convert to list, ExPTY expects map
 
     me = self()
 
@@ -94,7 +94,7 @@ defmodule Eliterm.PTY do
     end
 
     {:ok, pty} = ExPTY.spawn(bash_path, bash_args,
-      env: env,
+      env: env_map,
       cwd: cwd,
       name: "xterm-256color",
       cols: 80,

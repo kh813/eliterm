@@ -5,7 +5,8 @@ defmodule Eliterm.CLI do
   """
 
   def main(args) do
-    # クライアントノードとして起動（名前衝突を避けるためランダムな名前）
+    {opts, command, _} = OptionParser.parse(args, switches: [node: :string])
+
     client_name = "cli_#{:rand.uniform(10000)}" |> String.to_atom()
     {:ok, _} = Node.start(client_name, :shortnames)
 
@@ -14,11 +15,15 @@ defmodule Eliterm.CLI do
       Node.set_cookie(String.to_atom(File.read!(cookie_path)))
     end
 
-    {:ok, hostname} = :inet.gethostname()
-    daemon_node = String.to_atom("eliterm@#{hostname}")
+    daemon_node = if opts[:node] do
+      String.to_atom(opts[:node])
+    else
+      {:ok, hostname} = :inet.gethostname()
+      short_host = to_string(hostname) |> String.split(".") |> List.first()
+      String.to_atom("eliterm@#{short_host}")
+    end
 
-    # コマンドのパース
-    case args do
+    case command do
       ["cluster", "init"] -> 
         execute_rpc(daemon_node, Eliterm.Cluster, :init, [])
       ["cluster", "join", target] -> 
