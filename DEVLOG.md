@@ -35,3 +35,10 @@
   - `~/.bashrc` に SIGUSR1 トラップを自動生成し、bash側から自発的に環境変数・cwd・変数をファイルに吐き出させる機構を追加。
   - スナップショットの JSON 化と `.session/snapshot.json` への保存処理を追加。
 
+- Phase 1.5: `home/` ディレクトリ管理機能の実装を完了しました。
+  - `Eliterm.DataSync` にて `init_home/1` を実装し、初期ディレクトリやcrontabテンプレートを生成。
+  - `calc_size/1` で `du` コマンドを使ったサイズ・内訳計算を実装。
+  - `set_readonly/2` で `chmod` ベースのディレクトリ保護機能を実装。
+  - `rsync_copy/3` で `--info=progress2` を用いたプログレス付きディレクトリ転送を実装。
+  - `verify_checksum/1` にて `tar | shasum` を用いた高速かつパーミッション考慮のチェックサム機能を追加。
+

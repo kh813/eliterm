@@ -77,14 +77,14 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `~/.eliterm/sessions/<id>/.session/snapshot.json` への保存
 
 ### 1.5 home/ ディレクトリ管理
-- [ ] `~/.eliterm/sessions/<id>/home/` ディレクトリの初期化
-- [ ] `home/crontab` の初期テンプレート生成
-- [ ] `home/scripts/` ディレクトリの初期化
-- [ ] `home/` サイズ計算・内訳表示の実装
-- [ ] `home/` の書き込み禁止・解除（`chmod` ベース）
-- [ ] rsync による `home/` 一括コピーの実装（`System.cmd("rsync", ...)`）
-- [ ] コピー後の SHA256 チェックサム検証
-- [ ] rsync プログレスバー表示
+- [x] `~/.eliterm/sessions/<id>/home/` ディレクトリの初期化
+- [x] `home/crontab` の初期テンプレート生成
+- [x] `home/scripts/` ディレクトリの初期化
+- [x] `home/` サイズ計算・内訳表示の実装
+- [x] `home/` の書き込み禁止・解除（`chmod` ベース）
+- [x] rsync による `home/` 一括コピーの実装（`System.cmd("rsync", ...)`）
+- [x] コピー後の SHA256 チェックサム検証
+- [x] rsync プログレスバー表示
 
 ### 1.6 Quantum（cron）統合
 - [ ] `Eliterm.CronManager` GenServer の実装
