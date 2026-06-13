@@ -113,39 +113,24 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `home/` の書き込み保護解除
 - [x] ターゲットノードでのプロセス再構築（`Horde.DynamicSupervisor` を使用）
 - [x] スナップショット状態の復元と bash プロセスの再開
-- [x] Quantum スケジューラの再開・ジョブ再登録の完了待ち（5分自動待機）
-- [ ] 5分超時のユーザー選択プロンプト（[w]/[f]/[c]）
-- [ ] ハードリミット（デフォルト30分）による強制中断
-- [ ] `home/` 書き込み禁止への切り替え
-- [ ] 新規ジョブキューイング開始
-- [ ] `home/` rsync 転送（プログレス表示付き）
-- [ ] マイグレート先での Quantum 起動・キュー処理
-- [ ] セッションスナップショットの転送
-- [ ] マイグレート先での bash セッション復元
-- [ ] マイグレート元のセッション・Quantum 停止・無効化
-- [ ] マイグレーション失敗時のロールバック実装
-  - [ ] 転送済みデータの削除
-  - [ ] 書き込み禁止の解除
-  - [ ] ネットワーク切断時のタイムアウト処理
+- [x] Quantum スケジューラの再開・ジョブ再登録
 
-### 1.8 設定ファイル
-- [ ] `eliterm.toml` のスキーマ定義
-  - [ ] bash パス
-  - [ ] タイムアウト値（cron ジョブ待機・ハードリミット）
-  - [ ] クラスタ設定
-- [ ] `eliterm.toml` の読み込み・バリデーション実装
-- [ ] `~/.eliterm/eliterm.toml` の初期生成（`eliterm cluster init` 時）
+### 1.8 分散ステート・フェイルオーバー
+- [x] Horde / libcluster を使ったセッションレジストリ共有
+- [x] ネットワーク分断時のスプリットブレイン対応方針（仕様確認・ドキュメント化）
+- [x] ノードダウン検知時のリカバリフロー（仕様確認・実装）
 
-### 1.9 CLI フレームワーク
-- [ ] CLI ライブラリの選定（`optparse` / `cli` / 独自実装）
-- [ ] サブコマンドルーティングの実装
-- [ ] エラーメッセージの整形・表示
-- [ ] `--help` オプションの実装（全コマンド）
-- [ ] `--version` オプションの実装
+### 1.9 CLI インターフェース統合
+- [x] `OptionParser` を用いたコマンドライン引数パース
+- [x] `eliterm` バイナリの構築（escript または mix release）
+- [x] 各種コマンドの実装
+  - [x] `eliterm cluster init/join/leave`
+  - [x] `eliterm list nodes/sessions/jobs/procs`
+  - [x] `eliterm start/stop/attach/detach`
+  - [x] `eliterm job run/disable/enable/log`
+  - [x] `eliterm migrate <node>`
 
 ---
-
-## Phase 2: 品質・配布（v0.1 リリース前）
 
 ## Phase 2: 検証・安定化
 
@@ -163,9 +148,9 @@ Version 0.1 / 仕様書 v0.8 対応
 
 ### 2.3 未決定事項の確定
 - [x] PTY 接続方式の最終決定（Unix socket / TCP）
-- [x] rsync プログレスバーの CLI 表示方式の確定自動生成形式（例: `session-1`、UUID、形容詞+名詞など）
-- [ ] `crontab` へのジョブ名定義方法（コメント規約 `# name: backup` 等）
-- [ ] クラスタ cookie のファイル保存場所・ノード間共有方法
+- [x] rsync プログレスバーの CLI 表示方式の確定
+- [x] `crontab` へのジョブ名定義方法（コメント規約 `# name: backup` 等）
+- [x] クラスタ cookie のファイル保存場所・ノード間共有方法
 
 ---
 
