@@ -8,8 +8,11 @@ defmodule Eliterm.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Eliterm.Worker.start_link(arg)
-      # {Eliterm.Worker, arg}
+      {Horde.Registry, [name: Eliterm.Registry, keys: :unique, members: :auto]},
+      {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},
+      Eliterm.ClusterManager,
+      Eliterm.SessionSupervisor,
+      Eliterm.DataSync
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

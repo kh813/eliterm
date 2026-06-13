@@ -16,3 +16,7 @@
   - `.tool-versions` に Elixir 1.19.5, Erlang 28.0 を固定
   - `expty` が `cc_precompiler` によって各アーキテクチャの NIF バイナリを適切に解決できることを確認
 
+- Phase 1.1: OTP スーパーバイザーツリーを実装しました。
+  - `Eliterm.Application` に `Horde.Registry`, `Horde.DynamicSupervisor` を登録。
+  - `Eliterm.ClusterManager`, `Eliterm.SessionSupervisor`, `Eliterm.DataSync` の骨格を作成。
+

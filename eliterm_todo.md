@@ -31,12 +31,12 @@ Version 0.1 / 仕様書 v0.8 対応
 ## Phase 1: コア基盤（v0.1）
 
 ### 1.1 OTP スーパーバイザーツリー
-- [ ] `Eliterm.Application` の初期実装
-- [ ] `Horde.Registry` の起動・設定
-- [ ] `Horde.DynamicSupervisor` の起動・設定
-- [ ] `Eliterm.ClusterManager` GenServer の骨格実装
-- [ ] `Eliterm.SessionSupervisor` の実装
-- [ ] `Eliterm.DataSync` モジュールの骨格実装
+- [x] `Eliterm.Application` の初期実装
+- [x] `Horde.Registry` の起動・設定
+- [x] `Horde.DynamicSupervisor` の起動・設定
+- [x] `Eliterm.ClusterManager` GenServer の骨格実装
+- [x] `Eliterm.SessionSupervisor` の実装
+- [x] `Eliterm.DataSync` モジュールの骨格実装
 
 ### 1.2 クラスタ管理
 - [ ] `eliterm cluster init` — クラスタ初期化・cookie 生成・保存（`~/.eliterm/`）
