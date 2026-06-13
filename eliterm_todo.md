@@ -67,14 +67,14 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `eliterm session rename <old> <new>` — セッション名変更
 
 ### 1.4 セッションスナップショット
-- [ ] `Eliterm.SessionSnapshot` 構造体の定義
-- [ ] `declare -p` によるシェル変数の取得
-- [ ] `alias` によるエイリアスの取得
-- [ ] `HISTFILE` からのコマンド履歴取得
-- [ ] cwd の取得と `home/` 内相対パスへの正規化
-- [ ] 環境変数（`env`）の取得
-- [ ] スナップショットの JSON シリアライズ・デシリアライズ
-- [ ] `~/.eliterm/sessions/<id>/.session/snapshot.json` への保存
+- [x] `Eliterm.SessionSnapshot` 構造体の定義
+- [x] `declare -p` によるシェル変数の取得
+- [x] `alias` によるエイリアスの取得
+- [x] `HISTFILE` からのコマンド履歴取得
+- [x] cwd の取得と `home/` 内相対パスへの正規化
+- [x] 環境変数（`env`）の取得
+- [x] スナップショットの JSON シリアライズ・デシリアライズ
+- [x] `~/.eliterm/sessions/<id>/.session/snapshot.json` への保存
 
 ### 1.5 home/ ディレクトリ管理
 - [ ] `~/.eliterm/sessions/<id>/home/` ディレクトリの初期化

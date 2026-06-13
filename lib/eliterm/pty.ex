@@ -33,6 +33,15 @@ defmodule Eliterm.PTY do
 
     File.mkdir_p!(home_dir)
 
+    bashrc_path = Path.join(home_dir, ".bashrc")
+    unless File.exists?(bashrc_path) do
+      trap_code = """
+      trap 'pwd > ~/.session/cwd; env > ~/.session/env; declare -p > ~/.session/vars; alias > ~/.session/aliases' SIGUSR1
+      export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+      """
+      File.write!(bashrc_path, trap_code)
+    end
+
     sock_path = Path.join([home_dir, "..", ".session", "eliterm.sock"]) |> Path.expand()
     File.mkdir_p!(Path.dirname(sock_path))
     _ = File.rm(sock_path) # Remove stale socket

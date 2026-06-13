@@ -30,3 +30,8 @@
   - Unix Domain Socket 経由での送受信ロジック（PTYのI/Oプロキシ）を実装。
   - `Eliterm.ShellSession` スーパーバイザーの作成と `start_session/2` のバックエンド機能を提供。
 
+- Phase 1.4: セッションスナップショット機能の実装を完了しました。
+  - `Eliterm.SessionSnapshot` 構造体と `capture/3` メソッドを実装。
+  - `~/.bashrc` に SIGUSR1 トラップを自動生成し、bash側から自発的に環境変数・cwd・変数をファイルに吐き出させる機構を追加。
+  - スナップショットの JSON 化と `.session/snapshot.json` への保存処理を追加。
+
