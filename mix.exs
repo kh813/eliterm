@@ -31,7 +31,12 @@ defmodule Eliterm.MixProject do
       {:libcluster, "~> 3.4"},
       {:quantum, "~> 3.5"},
       {:expty, "~> 0.1"},
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:phoenix, "~> 1.7.0"},
+      {:phoenix_live_view, "~> 0.19.0"},
+      {:phoenix_html, "~> 3.3"},
+      {:bandit, "~> 1.0"},
+      {:desktop, "~> 1.5"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]

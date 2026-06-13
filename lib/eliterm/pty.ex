@@ -159,6 +159,10 @@ defmodule Eliterm.PTY do
     Enum.each(state.clients, fn client ->
       :gen_tcp.send(client, data)
     end)
+    
+    # Broadcast to Phoenix PubSub for LiveView
+    Phoenix.PubSub.broadcast(Eliterm.PubSub, "pty:#{state.session_id}", {:pty_data, data})
+    
     {:noreply, state}
   end
 
