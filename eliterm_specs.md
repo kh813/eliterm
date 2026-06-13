@@ -570,33 +570,25 @@ Alpine Linux の検討結果：
 
 ### 10.4 コンテナ実行バックエンド
 
-OS に応じて以下のバックエンドを使い分ける。eliterm は抽象レイヤー（`Eliterm.Container`）を介してバックエンドを切り替えるため、上位のコードはバックエンド差異を意識しない。
+コンテナバックエンドとして、全OS（Linux / macOS / WSL）共通で **Podman (rootless)** を標準とする。
 
 | ホスト OS | バックエンド | 備考 |
 |---|---|---|
 | Linux | Podman (rootless) | VM 不要・軽量・ユーザー権限のみ |
 | WSL | Podman (rootless) | Linux と同様 |
-| macOS 26 以上 | Apple container machine | macOS ネイティブ・ホームディレクトリ自動共有 |
-| macOS 25 以下 | Podman Machine | Virtualization.framework 経由で VM 起動 |
+| macOS | Podman Machine | 内部的に QEMU/Apple Hypervisor を用いた軽量 VM を管理し、自動的にディレクトリマウントなどを提供 |
 
 Docker はデーモンが root 権限で動作するため eliterm のユーザー権限方針と相容れず、採用しない。
-
-**Apple container machine（macOS 26以上）の特長：**
-- Apple 純正・Virtualization.framework 上で各コンテナが独立した軽量 VM で動作
-- 初回起動時にホストのユーザーアカウントを自動プロビジョニング
-- ホームディレクトリの自動共有（`home/` のマウント設定が不要）
-- OCI 互換（Debian slim イメージをそのまま利用可能）
+Virtualization.framework を自前で制御するアプローチ（Apple container machine 相当）は将来フェーズ（Phase 5等）へ見送り、まずは Podman にOS間の差異を吸収させる構成で堅牢な環境を提供する。
 
 **Elixir 側の抽象レイヤー：**
 
 ```
 Eliterm.Container（抽象）
-├── Eliterm.Container.Podman          Linux / WSL / macOS 25以下
-└── Eliterm.Container.AppleContainer  macOS 26以上
+└── Eliterm.Container.Podman          Linux / WSL / macOS 共通バックエンド
 ```
 
-両バックエンドとも OCI 互換のため、コンテナイメージ（Debian slim）は共通。
-`home/` のマウント方法のみバックエンドごとに実装を分ける。
+コンテナイメージ（Debian slim）を用い、ホスト側の `home/` を `-v` (bind mount) でコンテナ内にマウントする。
 
 ### 10.5 アプリケーションリスト管理
 

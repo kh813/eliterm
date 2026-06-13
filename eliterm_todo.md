@@ -154,40 +154,36 @@ Version 0.1 / 仕様書 v0.8 対応
 
 ---
 
-## Phase 3: macOS 対応（v0.2）
+## Phase 3: コンテナ・アプリケーション管理（v0.2）
 
-- [-] Virtualization.framework + Debian slim VM の起動・停止実装
-- [-] VM 内 `home/` の virtio-fs マウント設定
-- [-] macOS 向けバイナリビルド（aarch64 / x86_64）
-- [-] ExPTY NIF の macOS 向けプリコンパイル
-- [-] Podman Machine を使わない macOS ネイティブ動作の確認
-- [-] macOS 向けインストールスクリプト整備
+- [ ] Podman コマンドの存在チェックと利用可能検証（Mac の場合は podman machine 状態確認含む）
+- [ ] `Eliterm.Container` 抽象レイヤーの設計・実装
+- [ ] `Eliterm.Container.Podman` の実装（Linux / macOS 共通）
+- [ ] Debian slim コンテナイメージの管理（Pull）
+- [ ] コンテナ内での bash プロセス起動と PTY アタッチの切り替え
+- [ ] コンテナへの `home/` バインドマウント設定
+- [ ] `home/.eliterm-apps` スキーマ定義
+- [ ] `eliterm-apps` からの `apt` パッケージ自動インストール機能実装
+- [ ] マイグレーション時の `eliterm-apps` 転送と再構築
 
 ---
 
 ## Phase 4: 同期・自動化（v0.3）
 
-- [-] lsyncd による `home/` リアルタイム同期の実装
-- [-] lsyncd 設定ファイルの自動生成
-- [-] macOS スリープ検知（`NSWorkspace.willSleepNotification`）連携
-- [-] Linux スリープ検知（`systemd-inhibit`）連携
-- [-] スリープ検知時の自動マイグレートフロー
-- [-] ノードオフライン時の自動フェイルオーバー
+- [ ] lsyncd による `home/` リアルタイム同期の実装
+- [ ] lsyncd 設定ファイルの自動生成
+- [ ] macOS スリープ検知（`NSWorkspace.willSleepNotification`）連携
+- [ ] Linux スリープ検知（`systemd-inhibit`）連携
+- [ ] スリープ検知時の自動マイグレートフロー
+- [ ] ノードオフライン時の自動フェイルオーバー
 
 ---
 
-## Phase 5: アプリケーション管理（v0.4）
+## Phase 5: macOS ネイティブ仮想化対応（将来構想）
 
-- [-] `Eliterm.Container` 抽象レイヤーの設計・実装
-- [-] `Eliterm.Container.Podman` の実装（Linux / WSL / macOS 25以下）
-- [-] `Eliterm.Container.AppleContainer` の実装（macOS 26以上）
-- [-] `home/.eliterm-apps` スキーマ定義
-- [-] Debian slim コンテナイメージの管理
-- [-] `home/` のマウント（Podman: bind mount、Apple container: 自動共有）
-- [-] `eliterm-apps` からの apt パッケージ自動インストール
-- [-] pip / npm グローバルパッケージのインストール対応
-- [-] アーキテクチャ別パッケージ指定（aarch64 / x86_64）の対応
-- [-] マイグレーション時の `eliterm-apps` 転送・再現
+- [ ] Virtualization.framework + Debian slim VM の起動・停止実装
+- [ ] VM 内 `home/` の virtio-fs マウント設定
+- [ ] Podman Machine を使わない macOS ネイティブ動作環境の提供
 
 ---
 
