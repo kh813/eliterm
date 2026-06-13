@@ -22,6 +22,9 @@ defmodule Eliterm.SleepWatcher do
   defp start_port(bin_path) do
     if File.exists?(bin_path) do
       Logger.info("Starting SleepWatcher port...")
+      if :os.type() == {:unix, :darwin} do
+        System.cmd("xattr", ["-d", "com.apple.quarantine", bin_path], stderr_to_stdout: true)
+      end
       port = Port.open({:spawn_executable, bin_path}, [:binary, :exit_status, line: 256])
       {:ok, %{port: port, status: :ready}}
     else

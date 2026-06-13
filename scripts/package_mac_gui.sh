@@ -52,26 +52,9 @@ cat << 'EOF' > "$APP_DIR/Contents/Info.plist"
 </plist>
 EOF
 
-# Create Troubleshooting script
-cat << 'EOF' > "トラブルシューティング（開けない場合）.command"
-#!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ -d "$DIR/Eliterm.app" ]; then
-    xattr -cr "$DIR/Eliterm.app"
-fi
-if [ -d "/Applications/Eliterm.app" ]; then
-    xattr -cr "/Applications/Eliterm.app"
-fi
-open "x-apple.systempreferences:com.apple.preference.security"
-osascript -e 'display dialog "セキュリティ設定を開きました。\n\n「このまま開く」ボタンがある場合はクリックしてください。\nまたは、このスクリプトによってブロックが既に解除されているため、Eliterm.app をダブルクリックして開けるようになっています。" buttons {"OK"} default button "OK"'
-EOF
-
-chmod +x "トラブルシューティング（開けない場合）.command"
-
 echo "Creating DMG..."
 # Note: GitHub Actions will run hdiutil on the directory containing both the app and the command.
 mkdir -p Eliterm_Release
 mv "$APP_DIR" Eliterm_Release/
-mv "トラブルシューティング（開けない場合）.command" Eliterm_Release/
 
 echo "App bundle created successfully."

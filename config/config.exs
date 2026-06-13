@@ -4,7 +4,7 @@ config :eliterm, Eliterm.Scheduler,
   jobs: []
 
 config :eliterm, ElitermWeb.Endpoint,
-  http: [port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: 0],
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   server: true,
