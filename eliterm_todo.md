@@ -145,7 +145,7 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `mix release` 設定の最適化（`rel/env.sh.eex` などの調整）
 - [x] インストールスクリプト（`install.sh` / `install.ps1`）の作成
 - [x] `PATH` への `eliterm` コマンド自動追加処理
-- [ ] GitHub Actions によるビルドワークフローの構築（macOS / Windows コンパイル自動化）
+- [x] GitHub Actions によるビルドワークフローの構築（macOS / Windows コンパイル自動化）
 - [ ] コンパイル済みバイナリを組み込んだリリースパッケージの配布機構
 
 ### 2.3 未決定事項の確定

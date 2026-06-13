@@ -1,0 +1,81 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags (e.g., v0.1.0)
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Mac Sleep Watcher
+        run: swiftc priv/mac_sleep_watcher.swift -o mac_sleep_watcher
+      - name: Upload Mac Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac_sleep_watcher
+          path: mac_sleep_watcher
+
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Windows Sleep Watcher
+        run: |
+          $csc = (Get-ChildItem -Path "C:\Windows\Microsoft.NET\Framework64" -Filter "csc.exe" -Recurse | Sort-Object LastWriteTime -Descending)[0].FullName
+          & $csc /out:win_sleep_watcher.exe priv\win_sleep_watcher.cs
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: win_sleep_watcher.exe
+          path: win_sleep_watcher.exe
+
+  build-elixir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15.4'
+          otp-version: '26.0'
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Build escript
+        run: mix escript.build
+      - name: Upload Elixir CLI
+        uses: actions/upload-artifact@v4
+        with:
+          name: eliterm-cli
+          path: bin/eliterm
+
+  create-release:
+    needs: [build-mac, build-win, build-elixir]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download Mac Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: mac_sleep_watcher
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: win_sleep_watcher.exe
+      - name: Download Elixir CLI
+        uses: actions/download-artifact@v4
+        with:
+          name: eliterm-cli
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            mac_sleep_watcher/mac_sleep_watcher
+            win_sleep_watcher.exe/win_sleep_watcher.exe
+            eliterm-cli/eliterm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
