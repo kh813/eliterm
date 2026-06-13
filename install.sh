@@ -2,9 +2,10 @@
 set -e
 
 if [ "$(uname)" = "Darwin" ]; then
-    echo "Compiling macOS sleep watcher..."
+    echo "Downloading macOS sleep watcher..."
     mkdir -p ~/.local/bin
-    swiftc priv/mac_sleep_watcher.swift -o ~/.local/bin/eliterm_sleep_watcher
+    curl -fL -o ~/.local/bin/eliterm_sleep_watcher https://github.com/kh813/eliterm/releases/latest/download/mac_sleep_watcher
+    chmod +x ~/.local/bin/eliterm_sleep_watcher
 fi
 
 echo "Installing Eliterm..."
