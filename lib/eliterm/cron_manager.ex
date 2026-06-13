@@ -176,7 +176,9 @@ defmodule Eliterm.CronManager do
       "bash", "--posix", "-c", command
     ]
 
-    {output, exit_code} = System.cmd("podman", args, stderr_to_stdout: true)
+    bin = Eliterm.Container.Engine.executable() || "docker"
+
+    {output, exit_code} = System.cmd(bin, args, stderr_to_stdout: true)
 
     log_msg_end = "[#{DateTime.utc_now()}] [#{job_name}] END: exit_code=#{exit_code}\nOutput:\n#{output}\n"
     File.write!(sync_log, log_msg_end, [:append])

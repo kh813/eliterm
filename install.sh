@@ -7,7 +7,7 @@ mix compile
 mix escript.build
 
 mkdir -p ~/.local/bin
-cp eliterm ~/.local/bin/eliterm
+cp bin/eliterm ~/.local/bin/eliterm
 chmod +x ~/.local/bin/eliterm
 
 # Add to PATH if not already there

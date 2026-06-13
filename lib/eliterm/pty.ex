@@ -95,7 +95,9 @@ defmodule Eliterm.PTY do
     cwd_args = ["-w", cwd]
     final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
 
-    {:ok, pty} = ExPTY.spawn("podman", final_args,
+    bin = Eliterm.Container.Engine.executable() || "docker"
+
+    {:ok, pty} = ExPTY.spawn(bin, final_args,
       env: %{},
       cwd: home_dir,
       name: "xterm-256color",

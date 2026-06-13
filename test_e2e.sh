@@ -16,7 +16,7 @@ NODE2_PID=$!
 sleep 3
 
 HOST=$(hostname -s)
-CLI="./eliterm"
+CLI="bin/eliterm"
 
 echo "=== Nodes ==="
 $CLI --node node1@$HOST list nodes

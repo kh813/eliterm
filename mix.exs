@@ -8,7 +8,11 @@ defmodule Eliterm.MixProject do
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      escript: [main_module: Eliterm.CLI]
+      escript: [
+        main_module: Eliterm.CLI,
+        path: "bin/eliterm",
+        app: nil
+      ]
     ]
   end
 
