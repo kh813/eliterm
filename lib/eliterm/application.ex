@@ -25,7 +25,8 @@ defmodule Eliterm.Application do
          title: "Eliterm",
          size: {1000, 700},
          url: "http://localhost:4000",
-         icon: "priv/icon.png"
+         icon: "icon.png",
+         menubar: ElitermWeb.MenuBar
        ]},
       {Horde.Registry, [name: Eliterm.Registry, keys: :unique, members: :auto]},
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},

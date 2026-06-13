@@ -23,7 +23,7 @@ jobs:
       - name: Package macOS GUI
         run: ./scripts/package_mac_gui.sh
       - name: Create DMG
-        run: hdiutil create -volname Eliterm -srcfolder Eliterm.app -ov -format UDZO Eliterm-macOS.dmg
+        run: hdiutil create -volname Eliterm -srcfolder Eliterm_Release -ov -format UDZO Eliterm-macOS.dmg
       - name: Upload Mac Sleep Watcher
         uses: actions/upload-artifact@v4
         with:

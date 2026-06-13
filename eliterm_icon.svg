@@ -18,13 +18,12 @@
   term(4文字) x=377, 幅230 → 末尾607
   カーソル x=612, 幅22 → 末尾634 ← 背景640内に収まる
 -->
-<text x="88" y="208" style="fill:rgb(157, 143, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:monospace;font-size:96px;font-weight:700;text-anchor:start;dominant-baseline:auto">$</text>
-<text x="164" y="208" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:monospace;font-size:96px;font-weight:700;text-anchor:start;dominant-baseline:auto">eli</text>
-<text x="337" y="208" style="fill:rgb(157, 143, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:monospace;font-size:96px;font-weight:700;text-anchor:start;dominant-baseline:auto">term</text>
-<rect x="568" y="134" width="22" height="76" rx="3" style="fill:#9d8fff;;fill:rgb(157, 143, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="70" y="240" style="fill:rgb(157, 143, 255);stroke:none;font-family:monospace;font-size:180px;font-weight:700;">$</text>
+<text x="180" y="240" style="fill:rgb(255, 255, 255);stroke:none;font-family:monospace;font-size:180px;font-weight:700;">eli</text>
+<text x="480" y="240" style="fill:rgb(157, 143, 255);stroke:none;font-family:monospace;font-size:180px;font-weight:700;">term</text>
 
 <!-- 2行目 -->
-<text x="88" y="300" style="fill:rgb(157, 143, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:monospace;font-size:56px;font-weight:400;text-anchor:start;dominant-baseline:auto">→ migrating...</text>
+<text x="70" y="380" style="fill:rgb(157, 143, 255);stroke:none;font-family:monospace;font-size:96px;font-weight:400;">→ migrate</text>
 
 <!-- ノード -->
 <circle cx="190" cy="514" r="44" style="fill:none;stroke:rgb(157, 143, 255);color:rgb(0, 0, 0);stroke-width:7px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
