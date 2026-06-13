@@ -6,6 +6,9 @@ on:
       - 'v*' # Trigger on version tags (e.g., v0.1.0)
   workflow_dispatch: # Allow manual trigger for testing
 
+permissions:
+  contents: write
+
 jobs:
   build-mac:
     runs-on: macos-latest
@@ -113,10 +116,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            mac_sleep_watcher/mac_sleep_watcher
-            win_sleep_watcher.exe/win_sleep_watcher.exe
-            eliterm-cli/eliterm
-            Eliterm-macOS.dmg/Eliterm-macOS.dmg
-            Eliterm-Windows.zip/Eliterm-Windows.zip
+            mac_sleep_watcher
+            win_sleep_watcher.exe
+            eliterm
+            Eliterm-macOS.dmg
+            Eliterm-Windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
