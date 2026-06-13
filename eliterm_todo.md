@@ -15,16 +15,16 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] ライセンス選定・`LICENSE` ファイル追加
 
 ### 0.2 依存ライブラリの追加
-- [ ] `horde` を `mix.exs` に追加
-- [ ] `libcluster` を `mix.exs` に追加
-- [ ] `quantum-core` を `mix.exs` に追加
-- [ ] `ExPTY` を `mix.exs` に追加
-- [ ] 各ライブラリの動作確認（`mix deps.get` / `mix compile`）
+- [x] `horde` を `mix.exs` に追加
+- [x] `libcluster` を `mix.exs` に追加
+- [x] `quantum-core` を `mix.exs` に追加
+- [x] `ExPTY` を `mix.exs` に追加
+- [x] 各ライブラリの動作確認（`mix deps.get` / `mix compile`）
 
 ### 0.3 開発環境の検証
-- [ ] Elixir / OTP バージョン確認・固定（`.tool-versions` 等）
-- [ ] ExPTY の NIF がビルドできることを確認（Linux x86_64）
-- [ ] ExPTY の NIF がビルドできることを確認（Linux aarch64）
+- [x] Elixir / OTP バージョン確認・固定（`.tool-versions` 等）
+- [x] ExPTY の NIF がビルドできることを確認（Linux x86_64）
+- [x] ExPTY の NIF がビルドできることを確認（Linux aarch64）
 
 ---
 
