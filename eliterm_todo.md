@@ -194,13 +194,15 @@ Version 0.1 / 仕様書 v0.8 対応
 
 ---
 
-## Phase 6: デスクトップ GUI（v0.5）
+## Phase 5: デスクトップ GUI アプリ化（v0.5）
 
-- [-] elixir-desktop ライブラリの導入
-- [-] Phoenix LiveView による UI 実装
-- [-] CLI と同一バックエンドとの接続
-- [-] ghostty_ex への PTY バックエンド移行検討
-- [-] 全プラットフォーム向けインストーラ生成（`mix desktop.deploy`）
+- [ ] `elixir-desktop` および `Phoenix LiveView` 関連の依存ライブラリ導入
+- [ ] Phoenix アプリケーション基盤のセットアップ（Endpoint, Router 等）
+- [ ] LiveView ページの作成と `xterm.js` のフロントエンド統合
+- [ ] PTY (ExPTY) と LiveView の双方向 I/O 連携（Hooks 実装）
+- [ ] メジャーカラースキームのプリセット対応と TOML カスタマイズ実装
+- [ ] デスクトップアプリとしてのウィンドウ管理（`elixir-desktop` 設定）
+- [ ] macOS および Windows 向けネイティブパッケージビルドの検証
 
 ---
 
