@@ -20,7 +20,8 @@ defmodule Eliterm.Application do
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},
       Eliterm.ClusterManager,
       Eliterm.SessionSupervisor,
-      Eliterm.DataSync
+      Eliterm.DataSync,
+      Eliterm.SleepWatcher
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -50,6 +50,16 @@ defmodule Eliterm.CLI do
         execute_rpc(daemon_node, Eliterm.CronManager, :enable_job, [session_id, job_name])
       ["job", "log", session_id, job_name] ->
         execute_rpc(daemon_node, Eliterm.CronManager, :job_log, [session_id, job_name])
+      ["config", "auto-migrate", target] ->
+        config_path = Path.join([System.user_home!(), ".eliterm", "config.json"])
+        config = if File.exists?(config_path) do
+          Jason.decode!(File.read!(config_path))
+        else
+          %{}
+        end
+        new_config = Map.put(config, "auto_migrate", %{"target_node" => target})
+        File.write!(config_path, Jason.encode!(new_config, pretty: true))
+        IO.puts "Auto-migrate target set to #{target}"
       _ ->
         print_usage()
     end

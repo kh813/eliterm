@@ -170,12 +170,13 @@ Version 0.1 / 仕様書 v0.8 対応
 
 ## Phase 4: 同期・自動化（v0.3）
 
-- [ ] lsyncd による `home/` リアルタイム同期の実装
-- [ ] lsyncd 設定ファイルの自動生成
-- [ ] macOS スリープ検知（`NSWorkspace.willSleepNotification`）連携
-- [ ] Linux スリープ検知（`systemd-inhibit`）連携
-- [ ] スリープ検知時の自動マイグレートフロー
-- [ ] ノードオフライン時の自動フェイルオーバー
+- [x] スリープ検知のクロスプラットフォーム設計（Swift / systemd-inhibit）の策定
+- [ ] macOS 向けネイティブスリープ検知ヘルパー（Swift）の実装
+- [ ] インストール時の Swift ヘルパーコンパイル処理の追加
+- [ ] `Eliterm.SleepWatcher` Elixir モジュールの実装
+- [ ] `eliterm.toml` への自動マイグレーション設定（`target_node`）追加
+- [ ] スリープ検知時の自動全セッションマイグレートフローの統合
+- [ ] ノードオフライン時の自動フェイルオーバー（将来拡張）
 
 ---
 
