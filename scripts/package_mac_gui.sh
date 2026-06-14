@@ -56,14 +56,25 @@ cat << 'EOF' > "1_【重要】初回起動の方法.txt"
 【Eliterm のインストールと起動方法】
 
 Eliterm は開発元未署名アプリのため、通常のダブルクリックでは起動できません。
-システム設定を開かずに、以下の手順で起動してください：
 
-1. 「Eliterm.app」を「アプリケーション」フォルダにコピーします。
-2. コピーした Eliterm.app を **右クリック（または Controlキーを押しながらクリック）** し、メニューから「開く」を選択します。
+1. 「Eliterm.app」を隣の「Applications」フォルダにドラッグ＆ドロップしてコピーします。
+2. コピー先の Eliterm.app を **右クリック（または Controlキーを押しながらクリック）** し、メニューから「開く」を選択します。
 3. 「開発元を検証できません」という警告ダイアログが出ますが、そこにある「開く」ボタンをクリックしてください。
 
-この手順を行うことで、システム設定の「プライバシーとセキュリティ」画面を開く手間を省き、すぐにアプリを起動できます。
-以降は通常のダブルクリックで起動できるようになります。
+★もし誤ってダブルクリックしてしまい、OSの警告が出てアプリがブロックされた場合は、
+同梱の「2_設定画面を開く（ブロックされた場合）.webloc」をダブルクリックしてください。
+「プライバシーとセキュリティ」画面が一発で開きますので、画面下部にある「このまま開く」をクリックして許可してください。
+EOF
+
+cat << 'EOF' > "2_設定画面を開く（ブロックされた場合）.webloc"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>URL</key>
+    <string>x-apple.systempreferences:com.apple.preference.security</string>
+</dict>
+</plist>
 EOF
 
 echo "Creating DMG..."
@@ -71,5 +82,7 @@ echo "Creating DMG..."
 mkdir -p Eliterm_Release
 mv "$APP_DIR" Eliterm_Release/
 mv "1_【重要】初回起動の方法.txt" Eliterm_Release/
+mv "2_設定画面を開く（ブロックされた場合）.webloc" Eliterm_Release/
+ln -s /Applications Eliterm_Release/Applications
 
 echo "App bundle created successfully."
