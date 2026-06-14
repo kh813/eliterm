@@ -3,11 +3,14 @@ defmodule ElitermWeb.TerminalLive do
   require Logger
 
   @impl true
-  def mount(params, _session, socket) do
-    # When launched via CLI, it might pass "k" as a token, but we just use "default" for now
-    # Wait for "terminal_resize" to start the PTY
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Phoenix.PubSub.subscribe(Eliterm.PubSub, "theme")
+    end
     {:ok, assign(socket, session_id: "default", colors: get_colors())}
   end
+
+
 
   defp get_colors do
     path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
@@ -48,6 +51,11 @@ defmodule ElitermWeb.TerminalLive do
       socket
     end
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:theme_updated, colors}, socket) do
+    {:noreply, push_event(socket, "terminal_theme", %{colors: colors})}
   end
 
   @impl true

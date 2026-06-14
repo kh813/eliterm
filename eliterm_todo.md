@@ -206,6 +206,12 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] Windows 向け起動用ランチャー（`.exe`）および `.zip` パッケージの自動構築処理
 - [x] GitHub Actions ワークフローにて CLI 版と GUI 版の両方をビルド・リリースする設定
 
+## Phase 6: UI/UX 改善（v0.6）
+
+- [x] GUI メニューバーの実装と `Desktop.Menu` へのメニュー項目追加
+- [x] カラースキーム切り替えイベントの発火と TOML ファイルへの保存（Tomlパーサーでの上書きまたは手動更新）
+- [x] LiveView 経由でフロントエンドの xterm.js に対してリアルタイムに色情報を反映する機能
+
 ---
 
 *eliterm_todo.md — Version 0.1*

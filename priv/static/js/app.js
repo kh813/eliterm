@@ -37,6 +37,16 @@ Hooks.Terminal = {
       this.term.write(bytes);
     });
 
+    // Handle incoming theme updates
+    this.handleEvent("terminal_theme", payload => {
+      let colors = payload.colors;
+      this.term.options.theme = Object.assign({
+        background: 'transparent',
+        foreground: '#e5e5e5',
+        cursor: '#4ade80'
+      }, colors);
+    });
+
     // Resize handling using ResizeObserver (robust for dynamically sized containers)
     const resizeObserver = new ResizeObserver(() => {
       this.fitAddon.fit();
