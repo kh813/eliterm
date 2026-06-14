@@ -24,7 +24,7 @@ defmodule Eliterm.Application do
          id: ElitermWindow,
          title: "Eliterm",
          size: {1000, 700},
-         endpoint: ElitermWeb.Endpoint,
+         url: "http://localhost:4000",
          icon: "icon.png",
          menubar: ElitermWeb.MenuBar
        ]},
