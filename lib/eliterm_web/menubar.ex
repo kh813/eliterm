@@ -23,6 +23,8 @@ defmodule ElitermWeb.MenuBar do
       "monokai" -> %{"background" => "#272822", "foreground" => "#f8f8f2", "cursor" => "#f8f8f0"}
       "solarized" -> %{"background" => "#002b36", "foreground" => "#839496", "cursor" => "#93a1a1"}
       "dracula" -> %{"background" => "#282a36", "foreground" => "#f8f8f2", "cursor" => "#ff79c6"}
+      "solarized_light" -> %{"background" => "#fdf6e3", "foreground" => "#657b83", "cursor" => "#586e75"}
+      "gruvbox_light" -> %{"background" => "#fbf1c7", "foreground" => "#3c3836", "cursor" => "#af3a03"}
     end
 
     update_toml_colors(colors)
@@ -62,6 +64,8 @@ defmodule ElitermWeb.MenuBar do
           <item onclick="set_theme_monokai">Monokai</item>
           <item onclick="set_theme_solarized">Solarized Dark</item>
           <item onclick="set_theme_dracula">Dracula</item>
+          <item onclick="set_theme_solarized_light">Solarized Light</item>
+          <item onclick="set_theme_gruvbox_light">Gruvbox Light (Soft)</item>
         </menu>
       </menu>
     </menu>

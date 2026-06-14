@@ -13,6 +13,12 @@ Hooks.Terminal = {
         cursor: '#4ade80'
       }, colors)
     });
+    
+    if (colors.background) {
+      this.el.parentElement.style.backgroundColor = colors.background;
+    } else {
+      this.el.parentElement.style.backgroundColor = '#000000';
+    }
 
     this.fitAddon = new window.FitAddon.FitAddon();
     this.term.loadAddon(this.fitAddon);
@@ -45,6 +51,12 @@ Hooks.Terminal = {
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors);
+      
+      if (colors.background) {
+        this.el.parentElement.style.backgroundColor = colors.background;
+      } else {
+        this.el.parentElement.style.backgroundColor = '#000000';
+      }
     });
 
     // Resize handling using ResizeObserver (robust for dynamically sized containers)
