@@ -196,10 +196,10 @@ Version 0.1 / 仕様書 v0.8 対応
 
 ## Phase 5: デスクトップ GUI アプリ化（v0.5）
 
-- [ ] `elixir-desktop` および `Phoenix LiveView` 関連の依存ライブラリ導入
-- [ ] Phoenix アプリケーション基盤のセットアップ（Endpoint, Router 等）
-- [ ] LiveView ページの作成と `xterm.js` のフロントエンド統合
-- [ ] PTY (ExPTY) と LiveView の双方向 I/O 連携（Hooks 実装）
+- [x] `elixir-desktop` および `Phoenix LiveView` 関連の依存ライブラリ導入
+- [x] Phoenix アプリケーション基盤のセットアップ（Endpoint, Router 等）
+- [x] LiveView ページの作成と `xterm.js` のフロントエンド統合
+- [x] PTY (ExPTY) と LiveView の双方向 I/O 連携（Hooks 実装）
 - [x] メジャーカラースキームのプリセット対応と TOML カスタマイズ実装
 - [x] デスクトップアプリとしてのウィンドウ管理（`elixir-desktop` 設定）
 - [ ] macOS 向け `.app` バンドルおよび `.dmg` パッケージの自動構築処理

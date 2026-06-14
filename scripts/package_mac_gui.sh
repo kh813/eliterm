@@ -4,6 +4,9 @@ set -e
 echo "Building macOS GUI application..."
 export MIX_ENV=prod
 
+# Compile sleep watcher to priv/ so it gets bundled into the release
+swiftc priv/mac_sleep_watcher.swift -o priv/eliterm_sleep_watcher
+
 # Build the release
 mix release eliterm --overwrite
 

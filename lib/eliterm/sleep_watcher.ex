@@ -8,13 +8,25 @@ defmodule Eliterm.SleepWatcher do
 
   @impl true
   def init(_opts) do
+    bin_name = case :os.type() do
+      {:unix, _} -> "eliterm_sleep_watcher"
+      {:win32, :nt} -> "eliterm_sleep_watcher.exe"
+    end
+
+    local_path = Path.join([System.user_home!(), ".local", "bin", bin_name])
+    priv_path = Application.app_dir(:eliterm, "priv/#{bin_name}")
+
+    path_to_use = 
+      if File.exists?(local_path) do
+        local_path
+      else
+        priv_path
+      end
+
     case :os.type() do
-      {:unix, :darwin} ->
-        start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher"]))
-      {:unix, :linux} ->
-        start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher"]))
-      {:win32, :nt} ->
-        start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher.exe"]))
+      {:unix, :darwin} -> start_port(path_to_use)
+      {:unix, :linux} -> start_port(path_to_use)
+      {:win32, :nt} -> start_port(path_to_use)
       _ ->
         Logger.info("SleepWatcher is not supported on this OS yet.")
         :ignore

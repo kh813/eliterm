@@ -1,7 +1,11 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host "Building Windows GUI application..."
+Write-Output "Building Windows GUI application..."
 $env:MIX_ENV="prod"
+
+# Compile sleep watcher to priv/ so it gets bundled into the release
+$csc = (Get-ChildItem -Path "C:\Windows\Microsoft.NET\Framework64" -Filter "csc.exe" -Recurse | Sort-Object LastWriteTime -Descending)[0].FullName
+& $csc /out:priv\eliterm_sleep_watcher.exe priv\win_sleep_watcher.cs
 
 # Build the release
 mix release eliterm --overwrite

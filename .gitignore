@@ -23,3 +23,8 @@ erl_crash.dump
 eliterm-*.tar
 
 .eliterm/
+priv/eliterm_sleep_watcher
+priv/eliterm_sleep_watcher.exe
+Eliterm_Release/
+*.dmg
+*.webloc
