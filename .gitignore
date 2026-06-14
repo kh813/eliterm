@@ -30,3 +30,4 @@ Eliterm_Release/
 *.webloc
 .DS_Store
 **/.DS_Store
+*.log
