@@ -95,9 +95,11 @@ defmodule Eliterm.PTY do
 
     {final_bin, final_args, final_env} =
       if is_fallback or is_nil(bin) do
-        # Fallback to local bash
+        # Fallback to local bash: must inherit system environment so PATH works!
         bash_path = System.find_executable("bash") || "/bin/bash"
-        {bash_path, bash_args, env_map}
+        sys_env = System.get_env()
+        merged_env = Map.merge(sys_env, env_map)
+        {bash_path, bash_args, merged_env}
       else
         podman_args = ["exec", "-it"]
         env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
