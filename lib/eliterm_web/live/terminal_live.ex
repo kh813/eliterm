@@ -3,19 +3,14 @@ defmodule ElitermWeb.TerminalLive do
   require Logger
 
   @impl true
-  def mount(_params, _session, socket) do
-    colors = get_colors()
-    if connected?(socket) do
-      session = ensure_session()
-      Phoenix.PubSub.subscribe(Eliterm.PubSub, "pty:#{session.id}")
-      {:ok, assign(socket, session_id: session.id, colors: colors)}
-    else
-      {:ok, assign(socket, session_id: "default", colors: colors)}
-    end
+  def mount(params, _session, socket) do
+    # When launched via CLI, it might pass "k" as a token, but we just use "default" for now
+    # Wait for "terminal_resize" to start the PTY
+    {:ok, assign(socket, session_id: "default", colors: get_colors())}
   end
 
   defp get_colors do
-    path = Path.join([System.user_home!(), ".eliterm", "eliterm.toml"])
+    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
     if File.exists?(path) do
       case Toml.decode(File.read!(path)) do
         {:ok, parsed} -> get_in(parsed, ["gui", "colors"]) || %{}
@@ -34,13 +29,31 @@ defmodule ElitermWeb.TerminalLive do
   
   @impl true
   def handle_event("terminal_resize", %{"cols" => cols, "rows" => rows}, socket) do
-    Eliterm.PTY.resize(socket.assigns.session_id, cols, rows)
+    socket = if not Map.has_key?(socket.assigns, :pty_started) do
+      case Eliterm.start_session(socket.assigns.session_id, cols: cols, rows: rows) do
+        {:ok, _} -> :ok
+        {:error, {:already_started, _}} -> Eliterm.PTY.resize(socket.assigns.session_id, cols, rows)
+      end
+      Phoenix.PubSub.subscribe(Eliterm.PubSub, "pty:#{socket.assigns.session_id}")
+      
+      # Try to focus the window natively on Mac
+      Task.start(fn ->
+        Process.sleep(100)
+        Desktop.Window.show(ElitermWindow)
+      end)
+      
+      assign(socket, pty_started: true)
+    else
+      Eliterm.PTY.resize(socket.assigns.session_id, cols, rows)
+      socket
+    end
     {:noreply, socket}
   end
 
   @impl true
   def handle_info({:pty_data, data}, socket) do
-    {:noreply, push_event(socket, "terminal_output", %{data: data})}
+    b64_data = Base.encode64(data)
+    {:noreply, push_event(socket, "terminal_output", %{data: b64_data})}
   end
 
   defp ensure_session do

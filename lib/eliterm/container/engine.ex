@@ -71,22 +71,29 @@ defmodule Eliterm.Container.Engine do
     else
       ensure_installed!()
       container_name = "eliterm-#{session_id}"
-      System.cmd(bin, ["rm", "-f", container_name])
 
-      args = [
-        "run", "-d",
-        "--name", container_name,
-        "-v", "#{home_dir}:/home/user",
-        "-w", "/home/user",
-        "docker.io/library/debian:stable-slim",
-        "sleep", "infinity"
-      ]
-      
-      case System.cmd(bin, args) do
-        {_, 0} -> 
-          setup_environment(bin, container_name, home_dir)
+      # Try to start existing container first
+      case System.cmd(bin, ["start", container_name]) do
+        {_, 0} ->
           {:ok, container_name}
-        {err, _} -> {:error, err}
+        _ ->
+          # Container does not exist or failed to start, create a new one
+          System.cmd(bin, ["rm", "-f", container_name])
+          args = [
+            "run", "-d",
+            "--name", container_name,
+            "-v", "#{home_dir}:/home/user",
+            "-w", "/home/user",
+            "docker.io/library/debian:stable-slim",
+            "sleep", "infinity"
+          ]
+          
+          case System.cmd(bin, args) do
+            {_, 0} -> 
+              setup_environment(bin, container_name, home_dir)
+              {:ok, container_name}
+            {err, _} -> {:error, err}
+          end
       end
     end
   end
@@ -94,7 +101,7 @@ defmodule Eliterm.Container.Engine do
   def stop_session_container(session_id) do
     if bin = executable() do
       container_name = "eliterm-#{session_id}"
-      System.cmd(bin, ["rm", "-f", container_name])
+      System.cmd(bin, ["stop", container_name, "-t", "2"])
     end
     :ok
   end

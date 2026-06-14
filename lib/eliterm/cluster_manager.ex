@@ -34,7 +34,7 @@ defmodule Eliterm.ClusterManager do
 
   defp do_migration(session_id, target_node) do
     Logger.info("Starting migration of session #{session_id} to #{target_node}")
-    home_dir = Path.join([System.user_home!(), ".eliterm", "sessions", session_id, "home"])
+    home_dir = Path.join([Eliterm.base_dir(), "sessions", session_id, "home"])
 
     # 1. Capacity check
     {:ok, %{total: _total_size}} = Eliterm.DataSync.calc_size(home_dir)

@@ -4,7 +4,7 @@ defmodule Eliterm.Cluster do
   """
   require Logger
 
-  @eliterm_dir Path.join(System.user_home!(), ".eliterm")
+  @eliterm_dir Eliterm.base_dir()
 
   def init do
     File.mkdir_p!(@eliterm_dir)

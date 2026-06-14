@@ -10,7 +10,7 @@ defmodule Eliterm.CLI do
     client_name = "cli_#{:rand.uniform(10000)}" |> String.to_atom()
     {:ok, _} = Node.start(client_name, :shortnames)
 
-    cookie_path = Path.join([System.user_home!(), ".eliterm", "cookie"])
+    cookie_path = Path.join([Eliterm.base_dir(), "cookie"])
     if File.exists?(cookie_path) do
       Node.set_cookie(String.to_atom(File.read!(cookie_path)))
     end
@@ -51,7 +51,7 @@ defmodule Eliterm.CLI do
       ["job", "log", session_id, job_name] ->
         execute_rpc(daemon_node, Eliterm.CronManager, :job_log, [session_id, job_name])
       ["config", "auto-migrate", target] ->
-        config_path = Path.join([System.user_home!(), ".eliterm", "config.json"])
+        config_path = Path.join([Eliterm.base_dir(), "config.json"])
         config = if File.exists?(config_path) do
           Jason.decode!(File.read!(config_path))
         else

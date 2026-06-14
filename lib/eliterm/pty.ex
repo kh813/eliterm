@@ -105,15 +105,19 @@ defmodule Eliterm.PTY do
         env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
         cwd_args = ["-w", cwd]
         final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
-        {bin, final_args, %{}}
+        sys_env = System.get_env()
+        {bin, final_args, sys_env}
       end
+
+    cols = Keyword.get(opts, :cols, 80)
+    rows = Keyword.get(opts, :rows, 24)
 
     {:ok, pty} = ExPTY.spawn(final_bin, final_args,
       env: final_env,
-      cwd: cwd,
+      cwd: home_dir,
       name: "xterm-256color",
-      cols: 80,
-      rows: 24,
+      cols: cols,
+      rows: rows,
       on_data: on_data,
       on_exit: on_exit
     )

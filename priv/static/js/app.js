@@ -27,20 +27,53 @@ Hooks.Terminal = {
 
     // Handle incoming data from Elixir
     this.handleEvent("terminal_output", payload => {
-      this.term.write(payload.data);
+      // Decode Base64 to Uint8Array
+      const binaryString = atob(payload.data);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      this.term.write(bytes);
     });
 
-    // Resize handling
-    window.addEventListener("resize", () => {
+    // Resize handling using ResizeObserver (robust for dynamically sized containers)
+    const resizeObserver = new ResizeObserver(() => {
       this.fitAddon.fit();
       this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
     });
-    
-    // Initial resize trigger
+    resizeObserver.observe(this.el);
+
+    // Initial resize
     setTimeout(() => {
-        this.fitAddon.fit();
-        this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
+      this.fitAddon.fit();
+      this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
+      window.focus();
+      this.term.focus();
     }, 100);
+
+    // Custom Key Event Handler for Copy & Paste
+    this.term.attachCustomKeyEventHandler(async (e) => {
+      // Cmd+C or Ctrl+C to copy if text is selected
+      if (e.type === 'keydown' && e.key === 'c' && (e.metaKey || e.ctrlKey)) {
+        if (this.term.hasSelection()) {
+          navigator.clipboard.writeText(this.term.getSelection());
+          return false; // Prevent default so it doesn't send Ctrl+C to the shell if selected
+        }
+      }
+      
+      // Cmd+V or Ctrl+V to paste
+      if (e.type === 'keydown' && e.key === 'v' && (e.metaKey || e.ctrlKey)) {
+        try {
+          const text = await navigator.clipboard.readText();
+          this.pushEvent("terminal_input", { data: text });
+        } catch (err) {
+          console.error("Failed to read clipboard: ", err);
+        }
+        return false;
+      }
+      return true;
+    });
   }
 };
 

@@ -3,6 +3,20 @@ defmodule Eliterm do
   eliterm コアモジュール。セッション操作のエントリポイントを提供。
   """
 
+  def base_dir do
+    if env_dir = System.get_env("ELITERM_DATA_DIR") do
+      env_dir
+    else
+      if File.exists?(Path.join(File.cwd!(), "mix.exs")) do
+        Path.join(File.cwd!(), ".eliterm")
+      else
+        xdg = System.get_env("XDG_CONFIG_HOME")
+        config_home = if xdg && xdg != "", do: xdg, else: Path.join(System.user_home!(), ".config")
+        Path.join(config_home, "eliterm")
+      end
+    end
+  end
+
   def start_session(session_id, opts \\ []) do
     Horde.DynamicSupervisor.start_child(
       Eliterm.DistributedSupervisor,

@@ -20,7 +20,7 @@ defmodule Eliterm.ShellSession do
     Logger.info("Starting ShellSession for #{session_id}")
 
     home_dir = Keyword.get_lazy(opts, :home_dir, fn ->
-      Path.join([System.user_home!(), ".eliterm", "sessions", session_id, "home"])
+      Path.join([Eliterm.base_dir(), "sessions", session_id, "home"])
     end)
 
     children = [

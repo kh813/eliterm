@@ -49,7 +49,7 @@ defmodule Eliterm.CronManager do
   end
 
   def job_log(session_id, job_name, lines \\ 100) do
-    home_dir = Path.join([System.user_home!(), ".eliterm", "sessions", session_id, "home"])
+    home_dir = Path.join([Eliterm.base_dir(), "sessions", session_id, "home"])
     sync_log = Path.join([home_dir, "..", ".session", "sync.log"]) |> Path.expand()
     
     if File.exists?(sync_log) do

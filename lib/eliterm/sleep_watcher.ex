@@ -85,7 +85,7 @@ defmodule Eliterm.SleepWatcher do
   end
 
   defp get_target_node do
-    config_file = Path.join([System.user_home!(), ".eliterm", "config.json"])
+    config_file = Path.join([Eliterm.base_dir(), "config.json"])
     if File.exists?(config_file) do
       try do
         config = Jason.decode!(File.read!(config_file))

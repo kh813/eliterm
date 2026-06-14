@@ -19,7 +19,7 @@ defmodule Eliterm.DataSync do
   指定されたセッションの home/ ディレクトリを初期化する。
   """
   def init_home(session_id) do
-    home_dir = Path.join([System.user_home!(), ".eliterm", "sessions", session_id, "home"])
+    home_dir = Path.join([Eliterm.base_dir(), "sessions", session_id, "home"])
     File.mkdir_p!(home_dir)
     
     scripts_dir = Path.join(home_dir, "scripts")
