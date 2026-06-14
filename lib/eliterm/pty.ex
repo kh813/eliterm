@@ -90,16 +90,25 @@ defmodule Eliterm.PTY do
       send(me, {:pty_exit, exit_code})
     end
 
-    podman_args = ["exec", "-it"]
-    env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
-    cwd_args = ["-w", cwd]
-    final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
+    is_fallback = Eliterm.ContainerWorker.is_fallback?(session_id)
+    bin = Eliterm.Container.Engine.executable()
 
-    bin = Eliterm.Container.Engine.executable() || "docker"
+    {final_bin, final_args, final_env} =
+      if is_fallback or is_nil(bin) do
+        # Fallback to local bash
+        bash_path = System.find_executable("bash") || "/bin/bash"
+        {bash_path, bash_args, env_map}
+      else
+        podman_args = ["exec", "-it"]
+        env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
+        cwd_args = ["-w", cwd]
+        final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
+        {bin, final_args, %{}}
+      end
 
-    {:ok, pty} = ExPTY.spawn(bin, final_args,
-      env: %{},
-      cwd: home_dir,
+    {:ok, pty} = ExPTY.spawn(final_bin, final_args,
+      env: final_env,
+      cwd: cwd,
       name: "xterm-256color",
       cols: 80,
       rows: 24,
