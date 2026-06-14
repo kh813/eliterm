@@ -28,3 +28,5 @@ priv/eliterm_sleep_watcher.exe
 Eliterm_Release/
 *.dmg
 *.webloc
+.DS_Store
+**/.DS_Store
