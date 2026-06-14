@@ -50,6 +50,10 @@ defmodule Eliterm.CLI do
         execute_rpc(daemon_node, Eliterm.CronManager, :enable_job, [session_id, job_name])
       ["job", "log", session_id, job_name] ->
         execute_rpc(daemon_node, Eliterm.CronManager, :job_log, [session_id, job_name])
+      ["app", "install", session_id, pkg] ->
+        execute_rpc(daemon_node, Eliterm.AppManager, :install_app, [session_id, pkg])
+      ["app", "list", session_id] ->
+        execute_rpc(daemon_node, Eliterm.AppManager, :list_apps, [session_id])
       ["config", "auto-migrate", target] ->
         config_path = Path.join([Eliterm.base_dir(), "config.json"])
         config = if File.exists?(config_path) do
@@ -109,6 +113,10 @@ defmodule Eliterm.CLI do
       job disable <session_id> <job_name>
       job enable <session_id> <job_name>
       job log <session_id> <job_name>
+
+    Apps:
+      app install <session_id> <pkg_name>
+      app list <session_id>
     """
   end
 end

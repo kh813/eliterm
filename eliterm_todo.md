@@ -158,15 +158,15 @@ Version 0.1 / 仕様書 v0.8 対応
 
 ## Phase 3: コンテナ・アプリケーション管理（v0.2）
 
-- [ ] Podman コマンドの存在チェックと利用可能検証（Mac の場合は podman machine 状態確認含む）
-- [ ] `Eliterm.Container` 抽象レイヤーの設計・実装
-- [ ] `Eliterm.Container.Podman` の実装（Linux / macOS 共通）
-- [ ] Debian slim コンテナイメージの管理（Pull）
-- [ ] コンテナ内での bash プロセス起動と PTY アタッチの切り替え
-- [ ] コンテナへの `home/` バインドマウント設定
-- [ ] `home/.eliterm-apps` スキーマ定義
-- [ ] `eliterm-apps` からの `apt` パッケージ自動インストール機能実装
-- [ ] マイグレーション時の `eliterm-apps` 転送と再構築
+- [x] Podman/Docker コマンドの存在チェックと利用可能検証
+- [x] `Eliterm.Container` 抽象レイヤーの設計・実装
+- [x] `Eliterm.Container.Engine` の実装（Docker / Podman 共通対応）
+- [x] Debian slim コンテナイメージの管理（自動 Pull とコンテナ作成）
+- [x] コンテナ内での bash プロセス起動と PTY アタッチの切り替え
+- [x] コンテナへの `home/` バインドマウント設定
+- [x] `home/.eliterm-apps` スキーマ定義
+- [x] `eliterm-apps` からの `apt` パッケージ自動インストール機能実装
+- [x] マイグレーション時の `eliterm-apps` 転送と再構築
 
 ---
 
