@@ -187,8 +187,7 @@ defmodule Eliterm.PTY do
     Enum.each(state.clients, fn client ->
       :gen_tcp.close(client)
     end)
-    # Usually we would stop the session, but maybe we just restart the shell?
-    # For now, let the GenServer terminate.
+    Phoenix.PubSub.broadcast(Eliterm.PubSub, "pty:#{state.session_id}", {:pty_exit, exit_code})
     {:stop, :normal, state}
   end
 

@@ -25,7 +25,7 @@ defmodule Eliterm.ShellSession do
 
     children = [
       {Eliterm.ContainerWorker, [session_id: session_id, home_dir: home_dir]},
-      {Eliterm.PTY, [session_id: session_id, home_dir: home_dir]},
+      Supervisor.child_spec({Eliterm.PTY, [session_id: session_id, home_dir: home_dir]}, restart: :transient),
       {Eliterm.CronManager, [session_id: session_id, home_dir: home_dir]}
     ]
 

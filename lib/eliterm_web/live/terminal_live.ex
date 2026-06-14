@@ -56,6 +56,16 @@ defmodule ElitermWeb.TerminalLive do
     {:noreply, push_event(socket, "terminal_output", %{data: b64_data})}
   end
 
+  @impl true
+  def handle_info({:pty_exit, _exit_code}, socket) do
+    if Code.ensure_loaded?(Desktop.Window) do
+      Desktop.Window.quit()
+    else
+      System.stop(0)
+    end
+    {:noreply, socket}
+  end
+
   defp ensure_session do
     case Eliterm.list_sessions() do
       [] -> 
