@@ -11,6 +11,8 @@ defmodule Eliterm.SleepWatcher do
     case :os.type() do
       {:unix, :darwin} ->
         start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher"]))
+      {:unix, :linux} ->
+        start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher"]))
       {:win32, :nt} ->
         start_port(Path.join([System.user_home!(), ".local", "bin", "eliterm_sleep_watcher.exe"]))
       _ ->

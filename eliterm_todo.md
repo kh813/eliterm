@@ -173,12 +173,12 @@ Version 0.1 / 仕様書 v0.8 対応
 ## Phase 4: 同期・自動化（v0.3）
 
 - [x] スリープ検知のクロスプラットフォーム設計（Swift / systemd-inhibit）の策定
-- [ ] macOS 向けネイティブスリープ検知ヘルパー（Swift）の実装
+- [x] macOS 向けネイティブスリープ検知ヘルパー（Swift）の実装
 - [x] インストール時の Swift ヘルパーコンパイル処理の追加
 - [x] `Eliterm.SleepWatcher` Elixir モジュールの実装
 - [x] `eliterm.toml` への自動マイグレーション設定（`target_node`）追加
 - [x] スリープ検知時の自動全セッションマイグレートフローの統合
-- [ ] Linux 向けスリープ検知（`systemd-inhibit`）の実装
+- [x] Linux 向けスリープ検知（`systemd-inhibit`）の実装
 - [x] Windows 向けスリープ検知ヘルパー（C#）の実装
 - [x] Windows 向けインストールスクリプト（`install.ps1`）の作成
 - [x] Windows 上での `Eliterm.SleepWatcher` 統合
