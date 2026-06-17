@@ -40,6 +40,7 @@ defmodule Eliterm.Application do
          icon: "icon.png",
          menubar: ElitermWeb.MenuBar
        ]},
+      Eliterm.WindowWatcher,
       {Horde.Registry, [name: Eliterm.Registry, keys: :unique, members: :auto]},
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},
       Eliterm.ClusterManager,
