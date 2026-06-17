@@ -7,6 +7,8 @@ defmodule Eliterm.Application do
 
   @impl true
   def start(_type, _args) do
+    Eliterm.DependencyChecker.check_and_halt_if_missing!()
+    
     port = get_free_port()
     
     endpoint_config = Application.get_env(:eliterm, ElitermWeb.Endpoint)

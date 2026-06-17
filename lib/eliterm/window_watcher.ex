@@ -14,11 +14,9 @@ defmodule Eliterm.WindowWatcher do
   def handle_info(:check, state) do
     case Process.whereis(ElitermWindow) do
       nil ->
-        if state.shown do
-          shutdown_app()
-        end
+        # Just update state to hidden, don't kill the app!
         Process.send_after(self(), :check, 1000)
-        {:noreply, state}
+        {:noreply, %{state | shown: false}}
 
       pid ->
         try do
@@ -48,18 +46,15 @@ defmodule Eliterm.WindowWatcher do
           else
             if state.shown do
               # The window was shown and is now hidden or destroyed!
-              shutdown_app()
+              # Just update state
             end
             Process.send_after(self(), :check, 1000)
-            {:noreply, state}
+            {:noreply, %{state | shown: false}}
           end
         catch
           _, _ ->
-            if state.shown do
-              shutdown_app()
-            end
             Process.send_after(self(), :check, 1000)
-            {:noreply, state}
+            {:noreply, %{state | shown: false}}
         end
     end
   end

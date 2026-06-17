@@ -13,7 +13,7 @@ defmodule ElitermWeb.MenuBar do
 
   @impl true
   def handle_event("quit", menu) do
-    System.stop(0)
+    Eliterm.WindowWatcher.shutdown_app()
     {:noreply, menu}
   end
 

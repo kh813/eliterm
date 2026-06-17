@@ -90,49 +90,22 @@ defmodule Eliterm.PTY do
       send(me, {:pty_exit, exit_code})
     end
 
-    is_fallback = Eliterm.ContainerWorker.is_fallback?(session_id)
     bin = Eliterm.Container.Engine.executable()
-
-    {final_bin, final_args, final_env} =
-      if is_fallback or is_nil(bin) do
-        # Fallback to local bash: must inherit system environment so PATH works!
-        bash_path = 
-          if match?({:win32, :nt}, :os.type()) do
-            System.find_executable("wsl") || System.find_executable("bash") || "bash"
-          else
-            System.find_executable("bash") || "/bin/bash"
-          end
-
-        sys_env = System.get_env()
-        
-        # Ensure WSL starts in Linux ~ instead of Windows CWD
-        bash_args = 
-          if match?({:win32, :nt}, :os.type()) and bash_args == [] do
-            ["~"]
-          else
-            bash_args
-          end
-
-        # Do not override native HOME in fallback mode
-        merged_env = Map.merge(sys_env, env_map) |> Map.delete("HOME")
-        {bash_path, bash_args, merged_env}
-      else
-        podman_args = ["exec", "-it"]
-        env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
-        cwd_args = ["-w", cwd]
-        final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
-        sys_env = System.get_env()
-        
-        # Wait for container to be ready before trying to exec into it
-        wait_for_container(bin, "eliterm-#{session_id}")
-        
-        {bin, final_args, sys_env}
-      end
+    podman_args = ["exec", "-it"]
+    env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
+    cwd_args = ["-w", cwd]
+    final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
+    sys_env = System.get_env()
+    
+    # Wait for container to be ready before trying to exec into it
+    wait_for_container(bin, "eliterm-#{session_id}")
+    
+    {final_bin, final_args, final_env} = {bin, final_args, sys_env}
 
     cols = Keyword.get(opts, :cols, 80)
     rows = Keyword.get(opts, :rows, 24)
 
-    spawn_cwd = if is_fallback or is_nil(bin), do: System.user_home!(), else: home_dir
+    spawn_cwd = home_dir
 
     {:ok, pty} = ExPTY.spawn(final_bin, final_args,
       env: final_env,
@@ -250,4 +223,6 @@ defmodule Eliterm.PTY do
   def handle_info({:tcp_error, sock, _reason}, state) do
     {:noreply, %{state | clients: List.delete(state.clients, sock)}}
   end
+
+
 end
