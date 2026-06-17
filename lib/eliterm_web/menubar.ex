@@ -106,8 +106,8 @@ defmodule ElitermWeb.MenuBar do
         <item onclick="quit"><%= "Quit\t#{@cmd_key}+Q" %></item>
       </menu>
       <menu label="Edit">
-        <item onclick="copy"><%= "Copy\t#{@cmd_key}+C" %></item>
-        <item onclick="paste"><%= "Paste\t#{@cmd_key}+V" %></item>
+        <item onclick="copy"><%= "Copy (Cmd+C)" %></item>
+        <item onclick="paste"><%= "Paste (Cmd+V)" %></item>
       </menu>
       <menu label="View">
         <menu label="Font">
