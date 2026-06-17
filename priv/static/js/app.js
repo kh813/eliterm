@@ -3,7 +3,7 @@ let Hooks = {};
 Hooks.Terminal = {
   mounted() {
     let colors = JSON.parse(this.el.dataset.colors || "{}");
-    const defaultFont = 'Menlo, Monaco, "Courier New", monospace';
+    const defaultFont = '"Cascadia Code", Consolas, Menlo, Monaco, "Courier New", monospace';
     const userFont = this.el.dataset.font;
     const finalFont = userFont ? `"${userFont}", ${defaultFont}` : defaultFont;
 
