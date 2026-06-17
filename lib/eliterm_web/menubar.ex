@@ -3,7 +3,8 @@ defmodule ElitermWeb.MenuBar do
 
   @impl true
   def mount(menu) do
-    {:ok, menu}
+    scanned_fonts = Eliterm.Config.get(["gui", "scanned_fonts"], [])
+    {:ok, Desktop.Menu.assign(menu, :scanned_fonts, scanned_fonts)}
   end
 
   @impl true
@@ -23,6 +24,12 @@ defmodule ElitermWeb.MenuBar do
       System.cmd("open", ["-n", "-a", "Eliterm"])
     end
     {:noreply, menu}
+  end
+
+  def handle_event("scan_fonts", menu) do
+    fonts = Eliterm.FontScanner.scan()
+    Eliterm.Config.put(["gui", "scanned_fonts"], fonts)
+    {:noreply, Desktop.Menu.assign(menu, :scanned_fonts, fonts)}
   end
 
   def handle_event("copy", menu) do
@@ -55,16 +62,19 @@ defmodule ElitermWeb.MenuBar do
   end
 
   def handle_event("set_font_" <> font_id, menu) do
+    # font_id is string. We can decode if we passed base64, but since we know the keys:
     font = case font_id do
       "default" -> ""
       "menlo" -> "Menlo"
       "monaco" -> "Monaco"
       "consolas" -> "Consolas"
-      "cascadia_code" -> "Cascadia Code"
-      "fira_code" -> "Fira Code"
-      "source_code_pro" -> "Source Code Pro"
-      "hack" -> "Hack"
+      other -> String.replace(other, "_", " ")
     end
+
+    # Fix casing for known fonts that use camel case
+    font = Enum.find(["Fira Code", "Cascadia Code", "Source Code Pro", "Hack", "JetBrains Mono", "Ubuntu Mono"], font, fn known -> 
+      String.downcase(known) == String.downcase(font)
+    end)
 
     update_toml_font(font)
     Phoenix.PubSub.broadcast(Eliterm.PubSub, "theme", {:font_updated, font})
@@ -103,13 +113,21 @@ defmodule ElitermWeb.MenuBar do
         <menu label="Font">
           <item onclick="set_font_default">Default</item>
           <hr/>
-          <item onclick="set_font_menlo">Menlo</item>
-          <item onclick="set_font_monaco">Monaco</item>
-          <item onclick="set_font_consolas">Consolas</item>
-          <item onclick="set_font_cascadia_code">Cascadia Code</item>
-          <item onclick="set_font_fira_code">Fira Code</item>
-          <item onclick="set_font_source_code_pro">Source Code Pro</item>
-          <item onclick="set_font_hack">Hack</item>
+          <%= if match?({:unix, :darwin}, :os.type()) do %>
+            <item onclick="set_font_menlo">Menlo</item>
+            <item onclick="set_font_monaco">Monaco</item>
+          <% else %>
+            <item onclick="set_font_consolas">Consolas</item>
+          <% end %>
+          
+          <%= if @scanned_fonts != [] do %>
+            <hr/>
+            <%= for font <- @scanned_fonts do %>
+              <item onclick={"set_font_#{String.replace(String.downcase(font), " ", "_")}"}><%= font %></item>
+            <% end %>
+          <% end %>
+          <hr/>
+          <item onclick="scan_fonts">Scan &amp; update font list</item>
         </menu>
         <menu label="Color Scheme">
           <item onclick="set_theme_default">Default</item>
