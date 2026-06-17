@@ -43,6 +43,10 @@ defmodule ElitermWeb.MenuBar do
       "dracula" -> %{"background" => "#282a36", "foreground" => "#f8f8f2", "cursor" => "#ff79c6"}
       "solarized_light" -> %{"background" => "#fdf6e3", "foreground" => "#657b83", "cursor" => "#586e75"}
       "gruvbox_light" -> %{"background" => "#fbf1c7", "foreground" => "#3c3836", "cursor" => "#af3a03"}
+      "github_light" -> %{"background" => "#ffffff", "foreground" => "#24292f", "cursor" => "#044289"}
+      "github_dark" -> %{"background" => "#0d1117", "foreground" => "#c9d1d9", "cursor" => "#58a6ff"}
+      "catppuccin_mocha" -> %{"background" => "#1e1e2e", "foreground" => "#cdd6f4", "cursor" => "#f5e0dc"}
+      "catppuccin_latte" -> %{"background" => "#eff1f5", "foreground" => "#4c4f69", "cursor" => "#dc8a78"}
     end
 
     update_toml_colors(colors)
@@ -85,11 +89,17 @@ defmodule ElitermWeb.MenuBar do
       <menu label="View">
         <menu label="Color Scheme">
           <item onclick="set_theme_default">Default</item>
+          <hr/>
+          <item onclick="set_theme_github_light">GitHub Light</item>
+          <item onclick="set_theme_solarized_light">Solarized Light</item>
+          <item onclick="set_theme_gruvbox_light">Gruvbox Light</item>
+          <item onclick="set_theme_catppuccin_latte">Catppuccin Latte</item>
+          <hr/>
+          <item onclick="set_theme_github_dark">GitHub Dark</item>
           <item onclick="set_theme_monokai">Monokai</item>
           <item onclick="set_theme_solarized">Solarized Dark</item>
           <item onclick="set_theme_dracula">Dracula</item>
-          <item onclick="set_theme_solarized_light">Solarized Light</item>
-          <item onclick="set_theme_gruvbox_light">Gruvbox Light (Soft)</item>
+          <item onclick="set_theme_catppuccin_mocha">Catppuccin Mocha</item>
         </menu>
       </menu>
     </menubar>
