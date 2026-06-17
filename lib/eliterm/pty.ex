@@ -98,7 +98,17 @@ defmodule Eliterm.PTY do
         # Fallback to local bash: must inherit system environment so PATH works!
         bash_path = System.find_executable("bash") || "/bin/bash"
         sys_env = System.get_env()
-        merged_env = Map.merge(sys_env, env_map)
+        
+        # Ensure WSL starts in Linux ~ instead of Windows CWD
+        bash_args = 
+          if match?({:win32, :nt}, :os.type()) and bash_args == [] do
+            ["~"]
+          else
+            bash_args
+          end
+
+        # Do not override native HOME in fallback mode
+        merged_env = Map.merge(sys_env, env_map) |> Map.delete("HOME")
         {bash_path, bash_args, merged_env}
       else
         podman_args = ["exec", "-it"]
@@ -116,9 +126,11 @@ defmodule Eliterm.PTY do
     cols = Keyword.get(opts, :cols, 80)
     rows = Keyword.get(opts, :rows, 24)
 
+    spawn_cwd = if is_fallback or is_nil(bin), do: System.user_home!(), else: home_dir
+
     {:ok, pty} = ExPTY.spawn(final_bin, final_args,
       env: final_env,
-      cwd: home_dir,
+      cwd: spawn_cwd,
       name: "xterm-256color",
       cols: cols,
       rows: rows,
