@@ -132,7 +132,7 @@ Hooks.Terminal = {
       if (e.type === 'keydown' && (e.code === 'KeyV' || e.key.toLowerCase() === 'v') && (e.metaKey || e.ctrlKey)) {
         if (navigator.clipboard) {
           navigator.clipboard.readText().then(text => {
-            this.pushEvent("terminal_input", { data: text });
+            this.term.paste(text);
           }).catch(() => {
             this.pushEvent("clipboard_paste", {});
           });
@@ -166,7 +166,7 @@ Hooks.Terminal = {
     this.handleEvent("request_paste", () => {
       if (navigator.clipboard) {
         navigator.clipboard.readText().then(text => {
-          this.pushEvent("terminal_input", { data: text });
+          this.term.paste(text);
         }).catch(() => {
           this.pushEvent("clipboard_paste", {});
         });
@@ -177,13 +177,7 @@ Hooks.Terminal = {
     // Handle incoming paste events from LiveView (fallback if navigator.clipboard fails)
     this.handleEvent("terminal_paste", (payload) => {
       if (payload.text) {
-        this.pushEvent("terminal_input", { data: payload.text });
-      }
-    });
-
-    this.handleEvent("request_copy", () => {
-      if (this.term.hasSelection()) {
-        this.pushEvent("clipboard_copy", { text: this.term.getSelection() });
+        this.term.paste(payload.text);
       }
     });
   }
