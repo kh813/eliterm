@@ -38,9 +38,9 @@
 .xterm {
     cursor: text;
     position: relative;
-    user-select: text;
-    -ms-user-select: text;
-    -webkit-user-select: text;
+    user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
 }
 
 .xterm.focus,

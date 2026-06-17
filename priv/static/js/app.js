@@ -67,7 +67,8 @@ Hooks.Terminal = {
       this.term.options.theme = Object.assign({
         background: '#000000',
         foreground: '#e5e5e5',
-        cursor: '#4ade80'
+        cursor: '#4ade80',
+        selectionBackground: 'rgba(255, 255, 255, 0.3)'
       }, colors);
       
       if (colors.background) {
