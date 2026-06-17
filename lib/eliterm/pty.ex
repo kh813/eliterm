@@ -96,7 +96,13 @@ defmodule Eliterm.PTY do
     {final_bin, final_args, final_env} =
       if is_fallback or is_nil(bin) do
         # Fallback to local bash: must inherit system environment so PATH works!
-        bash_path = System.find_executable("bash") || "/bin/bash"
+        bash_path = 
+          if match?({:win32, :nt}, :os.type()) do
+            System.find_executable("wsl") || System.find_executable("bash") || "bash"
+          else
+            System.find_executable("bash") || "/bin/bash"
+          end
+
         sys_env = System.get_env()
         
         # Ensure WSL starts in Linux ~ instead of Windows CWD

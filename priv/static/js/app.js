@@ -11,9 +11,9 @@ Hooks.Terminal = {
       cursorBlink: true,
       fontFamily: finalFont,
       fontSize: 14,
-      allowTransparency: false,
+      allowTransparency: true,
       theme: Object.assign({
-        background: '#000000',
+        background: 'transparent',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors)
@@ -62,7 +62,7 @@ Hooks.Terminal = {
     this.handleEvent("terminal_theme", payload => {
       let colors = payload.colors;
       this.term.options.theme = Object.assign({
-        background: '#000000',
+        background: 'transparent',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors);
