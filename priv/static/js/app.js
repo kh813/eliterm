@@ -79,22 +79,24 @@ Hooks.Terminal = {
       // Cmd+C or Ctrl+C to copy if text is selected
       if (e.type === 'keydown' && e.key === 'c' && (e.metaKey || e.ctrlKey)) {
         if (this.term.hasSelection()) {
-          navigator.clipboard.writeText(this.term.getSelection());
+          this.pushEvent("clipboard_copy", { text: this.term.getSelection() });
           return false; // Prevent default so it doesn't send Ctrl+C to the shell if selected
         }
       }
       
       // Cmd+V or Ctrl+V to paste
       if (e.type === 'keydown' && e.key === 'v' && (e.metaKey || e.ctrlKey)) {
-        try {
-          const text = await navigator.clipboard.readText();
-          this.pushEvent("terminal_input", { data: text });
-        } catch (err) {
-          console.error("Failed to read clipboard: ", err);
-        }
+        this.pushEvent("clipboard_paste", {});
         return false;
       }
       return true;
+    });
+
+    // Handle incoming paste events from LiveView
+    this.handleEvent("terminal_paste", (payload) => {
+      if (payload.text) {
+        this.pushEvent("terminal_input", { data: payload.text });
+      }
     });
   }
 };

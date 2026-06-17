@@ -66,3 +66,9 @@
   - `install.sh` を作成し、`escript` でビルドした `eliterm` コマンドのインストールと `PATH` の自動設定を追加。
   - プロトコルを Unix Domain Socket、rsyncプログレスを `--info=progress2` で標準出力に流す方針で確定。
 
+## 2026-06-17
+- Phase 7: GUI安定化・機能補強（v0.1.16）の計画を開始し、以下の改善を実装・ドキュメント化しました。
+  - GUIアプリ内でのネイティブクリップボード連携によるコピペ（Cmd+C/Cmd+V, Ctrl+C/Ctrl+V）対応を実装。
+  - `TerminalLive` の表示領域計算のバグを修正（flexレイアウトとbox-sizingの調整により、vi等で最下行が見切れる問題を解決）。
+  - macOSの GUIアプリから起動した場合でも Docker Desktop/Podman を正しく検出できるよう、`/opt/homebrew/bin/` 等のパス探索ロジックを追加。
+  - コンテナ（Debian）起動時に自動で `apt-get update` を実行し、ユーザーがすぐに `apt-get install` できるよう改善。

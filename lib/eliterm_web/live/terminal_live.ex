@@ -54,6 +54,22 @@ defmodule ElitermWeb.TerminalLive do
   end
 
   @impl true
+  def handle_event("clipboard_copy", %{"text" => text}, socket) do
+    Eliterm.Clipboard.copy(text)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("clipboard_paste", _params, socket) do
+    case Eliterm.Clipboard.paste() do
+      {:ok, text} when text != "" ->
+        {:noreply, push_event(socket, "terminal_paste", %{text: text})}
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
   def handle_info({:theme_updated, colors}, socket) do
     {:noreply, push_event(socket, "terminal_theme", %{colors: colors})}
   end

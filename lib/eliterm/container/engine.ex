@@ -2,30 +2,56 @@ defmodule Eliterm.Container.Engine do
   require Logger
 
   def executable do
-    if path = System.find_executable("docker") do
-      case System.cmd(path, ["--version"]) do
-        {_, 0} -> path
-        _ -> check_podman()
-      end
-    else
-      check_podman()
-    end
-  rescue
-    ErlangError -> check_podman()
+    path = find_docker() || find_podman()
+    path
   end
 
-  defp check_podman do
-    if path = System.find_executable("podman") do
-      case System.cmd(path, ["--version"]) do
-        {_, 0} -> path
-        _ -> nil
+  defp find_docker do
+    home = System.get_env("HOME") || "/var/empty"
+    paths = [
+      "docker", 
+      "/opt/homebrew/bin/docker", 
+      "/usr/local/bin/docker", 
+      "/Applications/Docker.app/Contents/Resources/bin/docker",
+      Path.join(home, ".docker/bin/docker"),
+      Path.join(home, ".local/bin/docker")
+    ]
+    Enum.find_value(paths, fn path ->
+      exe = System.find_executable(path) || (if File.regular?(path), do: path, else: nil)
+      if exe do
+        case System.cmd(exe, ["--version"]) do
+          {_, 0} -> exe
+          _ -> nil
+        end
       end
-    else
-      nil
-    end
+    end)
   rescue
-    ErlangError -> nil
+    _ -> nil
   end
+
+  defp find_podman do
+    home = System.get_env("HOME") || "/var/empty"
+    paths = [
+      "podman", 
+      "/opt/homebrew/bin/podman", 
+      "/usr/local/bin/podman", 
+      "/opt/podman/bin/podman",
+      Path.join(home, ".local/bin/podman")
+    ]
+    Enum.find_value(paths, fn path ->
+      exe = System.find_executable(path) || (if File.regular?(path), do: path, else: nil)
+      if exe do
+        case System.cmd(exe, ["--version"]) do
+          {_, 0} -> exe
+          _ -> nil
+        end
+      end
+    end)
+  rescue
+    _ -> nil
+  end
+
+
 
   def ensure_installed! do
     exe = executable()
@@ -108,6 +134,8 @@ defmodule Eliterm.Container.Engine do
 
   defp setup_environment(bin, container_name, home_dir) do
     System.cmd(bin, ["exec", container_name, "mkdir", "-p", "/home/user"])
+    # Run apt-get update automatically on new containers so users can run apt-get install immediately
+    System.cmd(bin, ["exec", container_name, "apt-get", "update"])
     
     apps_file = Path.join(home_dir, ".eliterm-apps")
     if File.exists?(apps_file) do
@@ -132,7 +160,6 @@ defmodule Eliterm.Container.Engine do
 
     if length(apt_pkgs) > 0 do
       Logger.info("Apt install: #{inspect(apt_pkgs)}")
-      System.cmd(bin, ["exec", container_name, "apt-get", "update"])
       System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y" | apt_pkgs])
     end
   end
