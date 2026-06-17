@@ -13,11 +13,17 @@ defmodule Eliterm.Application do
     http_opts = Keyword.get(endpoint_config, :http, []) |> Keyword.put(:port, port)
     Application.put_env(:eliterm, ElitermWeb.Endpoint, Keyword.put(endpoint_config, :http, http_opts))
 
-    topologies = [
-      eliterm_cluster: [
-        strategy: Cluster.Strategy.Gossip
-      ]
-    ]
+    ports = [45892, 45893, 45894, 45895]
+    topologies = Enum.reduce(ports, [], fn port, acc ->
+      case :gen_udp.open(port, [:binary, active: 10, reuseaddr: true]) do
+        {:ok, socket} ->
+          :gen_udp.close(socket)
+          name = String.to_atom("eliterm_gossip_#{port}")
+          [{name, [strategy: Cluster.Strategy.Gossip, config: [port: port]]} | acc]
+        {:error, _reason} ->
+          acc
+      end
+    end)
 
     children = [
       Eliterm.Scheduler,
