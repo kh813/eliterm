@@ -101,13 +101,13 @@ defmodule ElitermWeb.MenuBar do
     ~H"""
     <menubar>
       <menu label="Eliterm">
-        <item onclick="new_terminal" shortcut={"#{@cmd_key}+N"}>New Terminal</item>
+        <item onclick="new_terminal"><%= "New Terminal\t#{@cmd_key}+N" %></item>
         <hr/>
-        <item onclick="quit" shortcut={"#{@cmd_key}+Q"}>Quit</item>
+        <item onclick="quit"><%= "Quit\t#{@cmd_key}+Q" %></item>
       </menu>
       <menu label="Edit">
-        <item onclick="copy" shortcut={"#{@cmd_key}+C"}>Copy</item>
-        <item onclick="paste" shortcut={"#{@cmd_key}+V"}>Paste</item>
+        <item onclick="copy"><%= "Copy\t#{@cmd_key}+C" %></item>
+        <item onclick="paste"><%= "Paste\t#{@cmd_key}+V" %></item>
       </menu>
       <menu label="View">
         <menu label="Font">

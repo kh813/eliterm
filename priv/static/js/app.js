@@ -152,7 +152,29 @@ Hooks.Terminal = {
       }
     });
 
-    // Handle incoming paste events from LiveView
+    // Handle incoming events from LiveView
+    this.handleEvent("request_copy", () => {
+      if (this.term.hasSelection()) {
+        const text = this.term.getSelection();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).catch(err => console.error(err));
+        }
+        this.pushEvent("clipboard_copy", { text: text });
+      }
+    });
+
+    this.handleEvent("request_paste", () => {
+      if (navigator.clipboard) {
+        navigator.clipboard.readText().then(text => {
+          this.pushEvent("terminal_input", { data: text });
+        }).catch(() => {
+          this.pushEvent("clipboard_paste", {});
+        });
+      } else {
+        this.pushEvent("clipboard_paste", {});
+      }
+    });
+    // Handle incoming paste events from LiveView (fallback if navigator.clipboard fails)
     this.handleEvent("terminal_paste", (payload) => {
       if (payload.text) {
         this.pushEvent("terminal_input", { data: payload.text });
