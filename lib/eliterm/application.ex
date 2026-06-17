@@ -7,7 +7,9 @@ defmodule Eliterm.Application do
 
   @impl true
   def start(_type, _args) do
-    Eliterm.DependencyChecker.check_and_halt_if_missing!()
+    if Application.get_env(:eliterm, :check_dependencies, true) do
+      Eliterm.DependencyChecker.check_and_halt_if_missing!()
+    end
     
     port = get_free_port()
     
@@ -31,29 +33,46 @@ defmodule Eliterm.Application do
       Eliterm.Scheduler,
       {Cluster.Supervisor, [topologies, [name: Eliterm.ClusterSupervisor]]},
       {Phoenix.PubSub, name: Eliterm.PubSub},
-      ElitermWeb.Endpoint,
-      {Desktop.Window,
-       [
-         app: :eliterm,
-         id: ElitermWindow,
-         title: "Eliterm",
-         size: {
-           Eliterm.Config.get(["gui", "window", "width"], 1000),
-           Eliterm.Config.get(["gui", "window", "height"], 700)
-         },
-         url: "http://localhost:#{port}",
-         icon: "icon.png",
-         menubar: ElitermWeb.MenuBar
-       ]},
-      Eliterm.WindowWatcher,
+      ElitermWeb.Endpoint
+    ]
+
+    children =
+      if Application.get_env(:eliterm, :start_gui, true) do
+        children ++ [
+          {Desktop.Window,
+           [
+             app: :eliterm,
+             id: ElitermWindow,
+             title: "Eliterm",
+             size: {
+               Eliterm.Config.get(["gui", "window", "width"], 1000),
+               Eliterm.Config.get(["gui", "window", "height"], 700)
+             },
+             url: "http://localhost:#{port}",
+             icon: "icon.png",
+             menubar: ElitermWeb.MenuBar
+           ]},
+          Eliterm.WindowWatcher
+        ]
+      else
+        children
+      end
+
+    children = children ++ [
       {Horde.Registry, [name: Eliterm.Registry, keys: :unique, members: :auto]},
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},
       Eliterm.ClusterManager,
       Eliterm.SessionSupervisor,
       Eliterm.DataSync,
-      Eliterm.Clipboard,
-      Eliterm.SleepWatcher
+      Eliterm.Clipboard
     ]
+
+    children =
+      if Application.get_env(:eliterm, :start_sleep_watcher, true) do
+        children ++ [Eliterm.SleepWatcher]
+      else
+        children
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

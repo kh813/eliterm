@@ -3,6 +3,7 @@ defmodule ElitermWindowWatcherTest do
 
   test "shutdown_app logic contains epmd kill and halt" do
     # Verify that shutdown_app is exported
+    Code.ensure_loaded(Eliterm.WindowWatcher)
     assert function_exported?(Eliterm.WindowWatcher, :shutdown_app, 0)
 
     # Read the AST of window_watcher.ex

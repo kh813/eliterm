@@ -15,7 +15,17 @@ config :eliterm, ElitermWeb.Endpoint,
 
 config :phoenix, :json_library, Jason
 
+config :eliterm,
+  start_gui: true,
+  start_sleep_watcher: true,
+  check_dependencies: true
+
 if Mix.env() == :test do
   config :eliterm, ElitermWeb.Endpoint,
     server: false
+
+  config :eliterm,
+    start_gui: false,
+    start_sleep_watcher: false,
+    check_dependencies: false
 end
