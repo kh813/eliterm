@@ -148,10 +148,10 @@ defmodule Eliterm.Container.Engine do
   end
 
   defp setup_environment(bin, container_name, home_dir) do
+    # Run apt-get update first so we can install sudo and other apps immediately
+    System.cmd(bin, ["exec", container_name, "apt-get", "update"])
     create_container_user(bin, container_name)
     System.cmd(bin, ["exec", container_name, "mkdir", "-p", "/home/user"])
-    # Run apt-get update automatically on new containers so users can run apt-get install immediately
-    System.cmd(bin, ["exec", container_name, "apt-get", "update"])
     
     apps_file = Path.join(home_dir, ".eliterm-apps")
     if File.exists?(apps_file) do
@@ -169,6 +169,16 @@ defmodule Eliterm.Container.Engine do
       _ = System.cmd(bin, ["exec", container_name, "groupadd", "-g", gid, "usergroup"])
       _ = System.cmd(bin, ["exec", container_name, "useradd", "-u", uid, "-g", gid, "-d", "/home/user", "-s", "/bin/bash", "user"])
       _ = System.cmd(bin, ["exec", container_name, "chown", "-R", "#{uid}:#{gid}", "/home/user"])
+
+      # Install sudo
+      _ = System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y", "sudo"])
+
+      # Add user to sudo group
+      _ = System.cmd(bin, ["exec", container_name, "usermod", "-aG", "sudo", "user"])
+
+      # Allow passwordless sudo for user
+      _ = System.cmd(bin, ["exec", container_name, "sh", "-c", "echo 'user ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/user"])
+      _ = System.cmd(bin, ["exec", container_name, "chmod", "0440", "/etc/sudoers.d/user"])
     end
   end
 
