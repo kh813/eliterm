@@ -22,11 +22,16 @@ Copy-Item -Recurse -Force "$BuildDir\*" "$DistDir\"
 # Create a small C# launcher to start the .bat hidden
 $Source = @"
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+
 class Program {
     static void Main(string[] args) {
+        string exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         ProcessStartInfo info = new ProcessStartInfo();
+        info.WorkingDirectory = exeDir;
         info.FileName = "cmd.exe";
-        info.Arguments = "/c \"bin\\eliterm.bat\" start";
+        info.Arguments = "/c bin\\eliterm.bat start > boot.log 2>&1";
         info.CreateNoWindow = true;
         info.UseShellExecute = false;
         Process.Start(info);
