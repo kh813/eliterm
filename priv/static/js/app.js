@@ -27,8 +27,15 @@ Hooks.Terminal = {
     this.fitAddon = new window.FitAddon.FitAddon();
     this.term.loadAddon(this.fitAddon);
 
+    this.customFit = () => {
+      this.fitAddon.fit();
+      if (this.term.rows > 1) {
+        this.term.resize(this.term.cols, this.term.rows - 1);
+      }
+    };
+
     this.term.open(this.el);
-    this.fitAddon.fit();
+    this.customFit();
 
     // Handle terminal input
     this.term.onData(data => {
@@ -69,19 +76,19 @@ Hooks.Terminal = {
       const userFont = payload.font;
       const finalFont = userFont ? `"${userFont}", ${defaultFont}` : defaultFont;
       this.term.options.fontFamily = finalFont;
-      this.fitAddon.fit();
+      this.customFit();
     });
 
     // Resize handling using ResizeObserver (robust for dynamically sized containers)
     const resizeObserver = new ResizeObserver(() => {
-      this.fitAddon.fit();
+      this.customFit();
       this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
     });
     resizeObserver.observe(this.el);
 
     // Initial resize
     setTimeout(() => {
-      this.fitAddon.fit();
+      this.customFit();
       this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
       window.focus();
       this.term.focus();
