@@ -51,6 +51,7 @@ defmodule Eliterm.Application do
       Eliterm.ClusterManager,
       Eliterm.SessionSupervisor,
       Eliterm.DataSync,
+      Eliterm.Clipboard,
       Eliterm.SleepWatcher
     ]
 
