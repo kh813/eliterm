@@ -3,9 +3,13 @@ let Hooks = {};
 Hooks.Terminal = {
   mounted() {
     let colors = JSON.parse(this.el.dataset.colors || "{}");
+    const defaultFont = 'Menlo, Monaco, "Courier New", monospace';
+    const userFont = this.el.dataset.font;
+    const finalFont = userFont ? `"${userFont}", ${defaultFont}` : defaultFont;
+
     this.term = new window.Terminal({
       cursorBlink: true,
-      fontFamily: this.el.dataset.font || 'Menlo, Monaco, "Courier New", monospace',
+      fontFamily: finalFont,
       fontSize: 14,
       theme: Object.assign({
         background: 'transparent',
@@ -61,7 +65,10 @@ Hooks.Terminal = {
 
     // Handle incoming font updates
     this.handleEvent("terminal_font", payload => {
-      this.term.options.fontFamily = payload.font || 'Menlo, Monaco, "Courier New", monospace';
+      const defaultFont = 'Menlo, Monaco, "Courier New", monospace';
+      const userFont = payload.font;
+      const finalFont = userFont ? `"${userFont}", ${defaultFont}` : defaultFont;
+      this.term.options.fontFamily = finalFont;
       this.fitAddon.fit();
     });
 
