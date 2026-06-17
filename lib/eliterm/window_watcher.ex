@@ -15,7 +15,7 @@ defmodule Eliterm.WindowWatcher do
     case Process.whereis(ElitermWindow) do
       nil ->
         if state.shown do
-          System.stop(0)
+          shutdown_app()
         end
         Process.send_after(self(), :check, 1000)
         {:noreply, state}
@@ -48,7 +48,7 @@ defmodule Eliterm.WindowWatcher do
           else
             if state.shown do
               # The window was shown and is now hidden or destroyed!
-              System.stop(0)
+              shutdown_app()
             end
             Process.send_after(self(), :check, 1000)
             {:noreply, state}
@@ -56,11 +56,18 @@ defmodule Eliterm.WindowWatcher do
         catch
           _, _ ->
             if state.shown do
-              System.stop(0)
+              shutdown_app()
             end
             Process.send_after(self(), :check, 1000)
             {:noreply, state}
         end
     end
+  end
+  def shutdown_app do
+    if match?({:win32, :nt}, :os.type()) do
+      # epmd.exe locks the release folder. We must kill it before halting.
+      System.cmd("epmd", ["-kill"])
+    end
+    System.halt(0)
   end
 end

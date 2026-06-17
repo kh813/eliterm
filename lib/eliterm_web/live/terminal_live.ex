@@ -100,9 +100,9 @@ defmodule ElitermWeb.TerminalLive do
   @impl true
   def handle_info({:pty_exit, _exit_code}, socket) do
     if Code.ensure_loaded?(Desktop.Window) do
-      Desktop.Window.quit()
+      Eliterm.WindowWatcher.shutdown_app()
     else
-      System.stop(0)
+      System.halt(0)
     end
     {:noreply, socket}
   end

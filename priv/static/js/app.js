@@ -11,9 +11,9 @@ Hooks.Terminal = {
       cursorBlink: true,
       fontFamily: finalFont,
       fontSize: 14,
-      allowTransparency: true,
+      allowTransparency: false,
       theme: Object.assign({
-        background: 'transparent',
+        background: '#000000',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors)
@@ -62,7 +62,7 @@ Hooks.Terminal = {
     this.handleEvent("terminal_theme", payload => {
       let colors = payload.colors;
       this.term.options.theme = Object.assign({
-        background: 'transparent',
+        background: '#000000',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors);
@@ -78,11 +78,21 @@ Hooks.Terminal = {
 
     // Handle incoming font updates
     this.handleEvent("terminal_font", payload => {
-      const defaultFont = 'Menlo, Monaco, "Courier New", monospace';
+      const defaultFont = 'Consolas, "Cascadia Code", Menlo, Monaco, "Courier New", monospace';
       const userFont = payload.font;
       const finalFont = userFont ? `"${userFont}", ${defaultFont}` : defaultFont;
       this.term.options.fontFamily = finalFont;
-      this.fitAddon.fit();
+      
+      // Ensure correct alignment after fonts load
+      if (document.fonts) {
+        document.fonts.ready.then(() => {
+          this.fitAddon.fit();
+          this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
+        });
+      } else {
+        this.fitAddon.fit();
+        this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
+      }
     });
 
     // Resize handling using ResizeObserver (robust for dynamically sized containers)

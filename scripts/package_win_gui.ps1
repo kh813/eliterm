@@ -30,6 +30,7 @@ class Program {
         string exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         ProcessStartInfo info = new ProcessStartInfo();
         info.WorkingDirectory = exeDir;
+        info.EnvironmentVariables["__COMPAT_LAYER"] = "HighDpiAware";
         info.FileName = "cmd.exe";
         info.Arguments = "/c bin\\eliterm.bat start > boot.log 2>&1";
         info.CreateNoWindow = true;
