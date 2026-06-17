@@ -74,3 +74,6 @@
   - コンテナ（Debian）起動時に自動で `apt-get update` を実行し、ユーザーがすぐに `apt-get install` できるよう改善。
   - ターミナル描画の `FitAddon` と Phoenix LiveView のコンテナ高さ (`data-phx-main`) の不一致により発生していたリサイズの無限ループ（1行に縮むバグや画面フリーズ）を、`position: absolute` を用いた明示的なウィンドウ境界へのピン留めにより完全に解消。
   - 本件のようなUI/UX変更によるデグレを防ぐため、`ANTIGRAVITY.md` に「リリース・タグプッシュ前のローカル動作テスト（目視確認）の必須化」を追加。
+  - Windows版パッケージングスクリプト (`scripts/package_win_gui.ps1`) を修正。`UseShellExecute=false` での `.bat` 直接起動エラーを回避するため `cmd.exe /c` 経由での起動に変更し、デバッグ用に `boot.log` を出力するように改善。
+  - Windowsアプリ用アイコンとして `priv/icon.png` を ImageMagick で `priv/icon.ico` に変換し、C# ランチャーのコンパイル時に埋め込むように修正。
+  - Windows環境（特にHyper-V環境等）で動的ポート予約により `libcluster` のデフォルトGossipポート (45892) が `eaddrinuse` になる問題に対し、起動時に 45892〜45895 のポートの空き状況を動的に確認し、空いているすべてのポートでマルチキャスト待機を行う堅牢なフォールバック・マルチポートディスカバリ機構を実装 (v0.1.17)。
