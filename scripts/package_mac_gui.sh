@@ -48,7 +48,7 @@ cat << 'EOF' > "$APP_DIR/Contents/Info.plist"
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1.0</string>
+    <string>0.1.15</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.15</string>
 </dict>
@@ -82,6 +82,7 @@ EOF
 
 echo "Creating DMG..."
 # Note: GitHub Actions will run hdiutil on the directory containing both the app and the command.
+rm -rf Eliterm_Release
 mkdir -p Eliterm_Release
 mv "$APP_DIR" Eliterm_Release/
 mv "1_【重要】初回起動の方法.txt" Eliterm_Release/

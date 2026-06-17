@@ -14,3 +14,8 @@ config :eliterm, ElitermWeb.Endpoint,
   debug_errors: true
 
 config :phoenix, :json_library, Jason
+
+if Mix.env() == :test do
+  config :eliterm, ElitermWeb.Endpoint,
+    server: false
+end

@@ -74,14 +74,4 @@ defmodule ElitermWeb.TerminalLive do
     {:noreply, socket}
   end
 
-  defp ensure_session do
-    case Eliterm.list_sessions() do
-      [] -> 
-        id = "default"
-        Eliterm.start_session(id)
-        %{id: id}
-      [first | _] -> 
-        first
-    end
-  end
 end

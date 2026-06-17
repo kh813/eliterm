@@ -20,6 +20,10 @@ jobs:
         run: brew install erlang elixir
       - name: Install dependencies
         run: mix deps.get
+      - name: Run tests and check compilation
+        run: |
+          mix compile --warnings-as-errors
+          mix test
       - name: Package macOS GUI
         run: ./scripts/package_mac_gui.sh
       - name: Create DMG
