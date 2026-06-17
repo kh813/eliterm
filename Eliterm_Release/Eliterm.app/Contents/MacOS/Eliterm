@@ -1,3 +1,8 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-exec "$DIR/../Resources/eliterm/bin/eliterm" start
+cd "$DIR/../Resources/eliterm"
+export RELEASE_ROOT="$(pwd)"
+pkill -f "Eliterm.app/Contents/Resources" 2>/dev/null || true
+killall eliterm_sleep_watcher 2>/dev/null || true
+sleep 0.5
+exec ./bin/eliterm start

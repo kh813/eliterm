@@ -26,7 +26,12 @@ cp -R _build/prod/rel/eliterm "$APP_DIR/Contents/Resources/eliterm"
 cat << 'EOF' > "$APP_DIR/Contents/MacOS/Eliterm"
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-exec "$DIR/../Resources/eliterm/bin/eliterm" start
+cd "$DIR/../Resources/eliterm"
+export RELEASE_ROOT="$(pwd)"
+pkill -f "Eliterm.app/Contents/Resources" 2>/dev/null || true
+killall eliterm_sleep_watcher 2>/dev/null || true
+sleep 0.5
+exec ./bin/eliterm start
 EOF
 
 chmod +x "$APP_DIR/Contents/MacOS/Eliterm"
@@ -56,28 +61,19 @@ cat << 'EOF' > "$APP_DIR/Contents/Info.plist"
 EOF
 
 cat << 'EOF' > "1_【重要】初回起動の方法.txt"
-【Eliterm のインストールと起動方法】
+【Eliterm の初回起動について（重要）】
 
-Eliterm は開発元未署名アプリのため、通常のダブルクリックでは起動できません。
+Elitermはオープンソースソフトウェアであり、現在Appleの有償開発者署名を行っていないため、
+Macのセキュリティ機能（Gatekeeper）により、そのままダブルクリックしても起動できません。
 
-1. 「Eliterm.app」を隣の「Applications」フォルダにドラッグ＆ドロップしてコピーします。
-2. コピー先の Eliterm.app を **右クリック（または Controlキーを押しながらクリック）** し、メニューから「開く」を選択します。
-3. 「開発元を検証できません」という警告ダイアログが出ますが、そこにある「開く」ボタンをクリックしてください。
+初回のみ、以下の手順で起動してください。
 
-★もし誤ってダブルクリックしてしまい、OSの警告が出てアプリがブロックされた場合は、
-同梱の「2_設定画面を開く（ブロックされた場合）.webloc」をダブルクリックしてください。
-「プライバシーとセキュリティ」画面が一発で開きますので、画面下部にある「このまま開く」をクリックして許可してください。
-EOF
+1. 「Eliterm.app」を「アプリケーション (Applications)」フォルダにドラッグ＆ドロップしてコピーします。
+2. コピー先の「Eliterm.app」を **右クリック（またはControl+クリック）** します。
+3. メニューから「開く」を選択します。
+4. 「開発元を検証できません」という警告ダイアログが出ますが、そこにある「開く」ボタンをクリックしてください。
 
-cat << 'EOF' > "2_設定画面を開く（ブロックされた場合）.webloc"
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>URL</key>
-    <string>x-apple.systempreferences:com.apple.preference.security</string>
-</dict>
-</plist>
+この操作を行うことで、2回目以降は普通にダブルクリックで起動できるようになります。
 EOF
 
 echo "Creating DMG..."
@@ -86,7 +82,6 @@ rm -rf Eliterm_Release
 mkdir -p Eliterm_Release
 mv "$APP_DIR" Eliterm_Release/
 mv "1_【重要】初回起動の方法.txt" Eliterm_Release/
-mv "2_設定画面を開く（ブロックされた場合）.webloc" Eliterm_Release/
 ln -s /Applications Eliterm_Release/Applications
 
 echo "App bundle created successfully."

@@ -123,7 +123,8 @@ defmodule Eliterm.PTY do
       cols: cols,
       rows: rows,
       on_data: on_data,
-      on_exit: on_exit
+      on_exit: on_exit,
+      closeFDs: true
     )
 
     # Start Unix Domain Socket listener
