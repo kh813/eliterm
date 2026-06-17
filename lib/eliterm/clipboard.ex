@@ -20,10 +20,16 @@ defmodule Eliterm.Clipboard do
   def copy(text) when is_binary(text) do
     if match?({:unix, :darwin}, :os.type()) do
       try do
-        port = Port.open({:spawn, "pbcopy"}, [:binary])
-        Port.command(port, text)
-        Port.close(port)
-        :ok
+        temp_file = Path.join(System.tmp_dir!(), "eliterm_cb_#{System.unique_integer([:positive])}")
+        File.write!(temp_file, text)
+        try do
+          case System.cmd("sh", ["-c", "pbcopy < #{temp_file}"]) do
+            {_, 0} -> :ok
+            {_, status} -> {:error, {:pbcopy_failed, status}}
+          end
+        after
+          File.rm(temp_file)
+        end
       rescue
         e ->
           Logger.error("Failed to copy using pbcopy: #{inspect(e)}")

@@ -2,6 +2,7 @@ defmodule ElitermDependencyCheckerTest do
   use ExUnit.Case, async: false
   alias Eliterm.DependencyChecker
 
+  @tag :skip_on_ci
   test "has_container_engine? returns true when docker or podman is in PATH" do
     # Assuming the environment running this test has at least one of them
     assert DependencyChecker.has_container_engine?() == true
