@@ -99,7 +99,7 @@ defmodule Eliterm.PTY do
         bash_path = System.find_executable("bash") || "/bin/bash"
         sys_env = System.get_env()
         merged_env = Map.merge(sys_env, env_map)
-        {bash_path, bash_args, Enum.to_list(merged_env)}
+        {bash_path, bash_args, merged_env}
       else
         podman_args = ["exec", "-it"]
         env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
@@ -110,7 +110,7 @@ defmodule Eliterm.PTY do
         # Wait for container to be ready before trying to exec into it
         wait_for_container(bin, "eliterm-#{session_id}")
         
-        {bin, final_args, Enum.to_list(sys_env)}
+        {bin, final_args, sys_env}
       end
 
     cols = Keyword.get(opts, :cols, 80)
