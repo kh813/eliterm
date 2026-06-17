@@ -8,7 +8,7 @@ defmodule ElitermWeb.TerminalLive do
       Phoenix.PubSub.subscribe(Eliterm.PubSub, "theme")
       Phoenix.PubSub.subscribe(Eliterm.PubSub, "menu_actions")
     end
-    {:ok, assign(socket, session_id: "default", colors: get_colors())}
+    {:ok, assign(socket, session_id: "default", colors: get_colors(), font: get_font())}
   end
 
 
@@ -16,12 +16,24 @@ defmodule ElitermWeb.TerminalLive do
   defp get_colors do
     path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
     if File.exists?(path) do
-      case Toml.decode(File.read!(path)) do
+      case Toml.decode_file(path) do
         {:ok, parsed} -> get_in(parsed, ["gui", "colors"]) || %{}
         _ -> %{}
       end
     else
       %{}
+    end
+  end
+
+  defp get_font do
+    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
+    if File.exists?(path) do
+      case Toml.decode_file(path) do
+        {:ok, parsed} -> get_in(parsed, ["gui", "font"]) || ""
+        _ -> ""
+      end
+    else
+      ""
     end
   end
 
@@ -73,6 +85,11 @@ defmodule ElitermWeb.TerminalLive do
   @impl true
   def handle_info({:theme_updated, colors}, socket) do
     {:noreply, push_event(socket, "terminal_theme", %{colors: colors})}
+  end
+
+  @impl true
+  def handle_info({:font_updated, font}, socket) do
+    {:noreply, push_event(socket, "terminal_font", %{font: font})}
   end
 
   @impl true

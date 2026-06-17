@@ -5,7 +5,7 @@ Hooks.Terminal = {
     let colors = JSON.parse(this.el.dataset.colors || "{}");
     this.term = new window.Terminal({
       cursorBlink: true,
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+      fontFamily: this.el.dataset.font || 'Menlo, Monaco, "Courier New", monospace',
       fontSize: 14,
       theme: Object.assign({
         background: 'transparent',
@@ -57,6 +57,12 @@ Hooks.Terminal = {
       } else {
         this.el.parentElement.style.backgroundColor = '#000000';
       }
+    });
+
+    // Handle incoming font updates
+    this.handleEvent("terminal_font", payload => {
+      this.term.options.fontFamily = payload.font || 'Menlo, Monaco, "Courier New", monospace';
+      this.fitAddon.fit();
     });
 
     // Resize handling using ResizeObserver (robust for dynamically sized containers)

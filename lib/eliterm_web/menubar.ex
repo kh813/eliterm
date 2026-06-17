@@ -54,6 +54,22 @@ defmodule ElitermWeb.MenuBar do
     {:noreply, menu}
   end
 
+  def handle_event("set_font_" <> font_id, menu) do
+    font = case font_id do
+      "default" -> ""
+      "menlo" -> "Menlo"
+      "monaco" -> "Monaco"
+      "consolas" -> "Consolas"
+      "fira_code" -> "Fira Code"
+      "source_code_pro" -> "Source Code Pro"
+      "hack" -> "Hack"
+    end
+
+    update_toml_font(font)
+    Phoenix.PubSub.broadcast(Eliterm.PubSub, "theme", {:font_updated, font})
+    {:noreply, menu}
+  end
+
   defp update_toml_colors(colors) do
     path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
     File.mkdir_p!(Path.dirname(path))
@@ -67,6 +83,25 @@ defmodule ElitermWeb.MenuBar do
     if colors != %{} do
       color_lines = Enum.map(colors, fn {k, v} -> "#{k} = \"#{v}\"" end)
       new_section = "\n[gui.colors]\n" <> Enum.join(color_lines, "\n") <> "\n"
+      File.write!(path, String.trim(content) <> "\n" <> new_section)
+    else
+      File.write!(path, String.trim(content) <> "\n")
+    end
+  end
+
+  defp update_toml_font(font) do
+    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
+    File.mkdir_p!(Path.dirname(path))
+    
+    content = if File.exists?(path), do: File.read!(path), else: ""
+    
+    # Simple regex to replace or add [gui] font line. If [gui] doesn't exist, we just append it.
+    # Note: parsing and rewriting TOML properly is hard, so we do a simple regex for `font = "..."`
+    # For a robust solution, we should parse the whole TOML, but since eliterm.toml is managed here it's okay.
+    content = String.replace(content, ~r/\n?\[gui\]\nfont = "[^"]*"/, "")
+    
+    if font != "" do
+      new_section = "\n[gui]\nfont = \"#{font}\"\n"
       File.write!(path, String.trim(content) <> "\n" <> new_section)
     else
       File.write!(path, String.trim(content) <> "\n")
@@ -87,6 +122,16 @@ defmodule ElitermWeb.MenuBar do
         <item onclick="paste" shortcut="Cmd+V">Paste</item>
       </menu>
       <menu label="View">
+        <menu label="Font">
+          <item onclick="set_font_default">Default</item>
+          <hr/>
+          <item onclick="set_font_menlo">Menlo</item>
+          <item onclick="set_font_monaco">Monaco</item>
+          <item onclick="set_font_consolas">Consolas</item>
+          <item onclick="set_font_fira_code">Fira Code</item>
+          <item onclick="set_font_source_code_pro">Source Code Pro</item>
+          <item onclick="set_font_hack">Hack</item>
+        </menu>
         <menu label="Color Scheme">
           <item onclick="set_theme_default">Default</item>
           <hr/>
