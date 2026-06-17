@@ -99,14 +99,18 @@ defmodule Eliterm.PTY do
         bash_path = System.find_executable("bash") || "/bin/bash"
         sys_env = System.get_env()
         merged_env = Map.merge(sys_env, env_map)
-        {bash_path, bash_args, merged_env}
+        {bash_path, bash_args, Enum.to_list(merged_env)}
       else
         podman_args = ["exec", "-it"]
         env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
         cwd_args = ["-w", cwd]
         final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args
         sys_env = System.get_env()
-        {bin, final_args, sys_env}
+        
+        # Wait for container to be ready before trying to exec into it
+        wait_for_container(bin, "eliterm-#{session_id}")
+        
+        {bin, final_args, Enum.to_list(sys_env)}
       end
 
     cols = Keyword.get(opts, :cols, 80)
@@ -152,6 +156,23 @@ defmodule Eliterm.PTY do
   def handle_cast({:resize, cols, rows}, state) do
     ExPTY.resize(state.pty, cols, rows)
     {:noreply, state}
+  end
+
+  defp wait_for_container(bin, name, retries \\ 120)
+  defp wait_for_container(_bin, _name, 0), do: :ok
+  defp wait_for_container(bin, name, retries) do
+    case System.cmd(bin, ["ps", "--format", "{{.Names}}", "--filter", "name=#{name}"]) do
+      {output, 0} ->
+        if String.contains?(output, name) do
+          :ok
+        else
+          Process.sleep(500)
+          wait_for_container(bin, name, retries - 1)
+        end
+      _ ->
+        Process.sleep(500)
+        wait_for_container(bin, name, retries - 1)
+    end
   end
 
   @impl true

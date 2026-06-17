@@ -91,6 +91,10 @@ defmodule Eliterm.SleepWatcher do
 
   def handle_info({port, {:exit_status, status}}, %{port: port} = state) do
     Logger.error("SleepWatcher port exited with status #{status}")
+    if status != 0 and :os.type() == {:unix, :darwin} do
+      Logger.warning("Possible Gatekeeper block detected. Opening Security & Privacy settings...")
+      System.cmd("open", ["x-apple.systempreferences:com.apple.preference.security"])
+    end
     {:stop, :normal, state}
   end
 
