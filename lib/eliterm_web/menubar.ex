@@ -48,12 +48,12 @@ defmodule ElitermWeb.MenuBar do
       "monokai" -> %{"background" => "#272822", "foreground" => "#f8f8f2", "cursor" => "#f8f8f0", "selectionBackground" => "rgba(255, 255, 255, 0.25)"}
       "solarized" -> %{"background" => "#002b36", "foreground" => "#839496", "cursor" => "#93a1a1", "selectionBackground" => "rgba(255, 255, 255, 0.2)"}
       "dracula" -> %{"background" => "#282a36", "foreground" => "#f8f8f2", "cursor" => "#ff79c6", "selectionBackground" => "rgba(255, 255, 255, 0.25)"}
-      "solarized_light" -> %{"background" => "#fdf6e3", "foreground" => "#657b83", "cursor" => "#586e75", "selectionBackground" => "rgba(0, 0, 0, 0.15)"}
-      "gruvbox_light" -> %{"background" => "#fbf1c7", "foreground" => "#3c3836", "cursor" => "#af3a03", "selectionBackground" => "rgba(0, 0, 0, 0.15)"}
+      "solarized_light" -> %{"background" => "#fdf6e3", "foreground" => "#657b83", "cursor" => "#586e75", "selectionBackground" => "rgba(38, 139, 210, 0.25)"}
+      "gruvbox_light" -> %{"background" => "#fbf1c7", "foreground" => "#3c3836", "cursor" => "#af3a03", "selectionBackground" => "rgba(69, 133, 136, 0.25)"}
       "github_light" -> %{"background" => "#ffffff", "foreground" => "#24292f", "cursor" => "#044289", "selectionBackground" => "rgba(4, 66, 137, 0.2)"}
       "github_dark" -> %{"background" => "#0d1117", "foreground" => "#c9d1d9", "cursor" => "#58a6ff", "selectionBackground" => "rgba(88, 166, 255, 0.3)"}
       "catppuccin_mocha" -> %{"background" => "#1e1e2e", "foreground" => "#cdd6f4", "cursor" => "#f5e0dc", "selectionBackground" => "rgba(255, 255, 255, 0.2)"}
-      "catppuccin_latte" -> %{"background" => "#eff1f5", "foreground" => "#4c4f69", "cursor" => "#dc8a78", "selectionBackground" => "rgba(0, 0, 0, 0.15)"}
+      "catppuccin_latte" -> %{"background" => "#eff1f5", "foreground" => "#4c4f69", "cursor" => "#dc8a78", "selectionBackground" => "rgba(30, 102, 245, 0.2)"}
     end
 
     update_toml_colors(colors)
