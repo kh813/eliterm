@@ -127,18 +127,22 @@ defmodule Eliterm.PTY do
       closeFDs: true
     )
 
-    # Start Unix Domain Socket listener
-    {:ok, listen_sock} = :gen_tcp.listen(0, [
+    # Start Unix Domain Socket listener (may fail on Windows due to :eafnosupport)
+    listen_sock = case :gen_tcp.listen(0, [
       :binary,
       {:ifaddr, {:local, String.to_charlist(sock_path)}},
       {:active, true},
       {:packet, 0}
-    ])
-
-    File.chmod!(sock_path, 0o600)
-
-    # Accept the first connection asynchronously
-    send(self(), :accept_client)
+    ]) do
+      {:ok, sock} ->
+        File.chmod!(sock_path, 0o600)
+        # Accept the first connection asynchronously
+        send(self(), :accept_client)
+        sock
+      {:error, reason} ->
+        Logger.warning("Failed to start Unix Domain Socket for PTY: #{inspect(reason)}. Local sock clients disabled.")
+        nil
+    end
 
     {:ok, %{
       session_id: session_id,
@@ -177,6 +181,7 @@ defmodule Eliterm.PTY do
   end
 
   @impl true
+  def handle_info(:accept_client, %{listen_sock: nil} = state), do: {:noreply, state}
   def handle_info(:accept_client, state) do
     # Accept one client connection
     case :gen_tcp.accept(state.listen_sock, 0) do
