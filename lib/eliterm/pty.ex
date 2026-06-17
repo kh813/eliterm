@@ -97,7 +97,13 @@ defmodule Eliterm.PTY do
     end
 
     bin = Eliterm.Container.Engine.executable()
-    podman_args = ["exec", "-it"]
+    uid = Eliterm.Container.Engine.get_host_uid()
+    podman_args =
+      if uid != "0" do
+        ["exec", "-it", "-u", "user"]
+      else
+        ["exec", "-it"]
+      end
     env_args = Enum.flat_map(env_map, fn {k, v} -> ["-e", "#{k}=#{v}"] end)
     cwd_args = ["-w", cwd]
     final_args = podman_args ++ env_args ++ cwd_args ++ ["eliterm-#{session_id}", "bash"] ++ bash_args

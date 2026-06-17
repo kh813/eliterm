@@ -90,6 +90,20 @@ defmodule Eliterm.Container.Engine do
     end
   end
 
+  def get_host_uid do
+    case System.cmd("id", ["-u"]) do
+      {out, 0} -> String.trim(out)
+      _ -> "1000"
+    end
+  end
+
+  def get_host_gid do
+    case System.cmd("id", ["-g"]) do
+      {out, 0} -> String.trim(out)
+      _ -> "1000"
+    end
+  end
+
   def start_session_container(session_id, home_dir) do
     bin = executable()
     if is_nil(bin) do
@@ -108,6 +122,7 @@ defmodule Eliterm.Container.Engine do
           args = [
             "run", "-d",
             "--name", container_name,
+            "-h", "eliterm",
             "-v", "#{home_dir}:/home/user",
             "-w", "/home/user",
             "docker.io/library/debian:stable-slim",
@@ -133,6 +148,7 @@ defmodule Eliterm.Container.Engine do
   end
 
   defp setup_environment(bin, container_name, home_dir) do
+    create_container_user(bin, container_name)
     System.cmd(bin, ["exec", container_name, "mkdir", "-p", "/home/user"])
     # Run apt-get update automatically on new containers so users can run apt-get install immediately
     System.cmd(bin, ["exec", container_name, "apt-get", "update"])
@@ -141,6 +157,18 @@ defmodule Eliterm.Container.Engine do
     if File.exists?(apps_file) do
       Logger.info("Installing packages from .eliterm-apps for #{container_name}")
       install_packages(bin, container_name, apps_file)
+    end
+  end
+
+  defp create_container_user(bin, container_name) do
+    uid = get_host_uid()
+    gid = get_host_gid()
+
+    if uid != "0" do
+      # Create group and user in container matching host UID and GID
+      _ = System.cmd(bin, ["exec", container_name, "groupadd", "-g", gid, "usergroup"])
+      _ = System.cmd(bin, ["exec", container_name, "useradd", "-u", uid, "-g", gid, "-d", "/home/user", "-s", "/bin/bash", "user"])
+      _ = System.cmd(bin, ["exec", container_name, "chown", "-R", "#{uid}:#{gid}", "/home/user"])
     end
   end
 
