@@ -1,6 +1,6 @@
 defmodule ElitermWeb.TerminalLive do
   use ElitermWeb, :live_view
-  require Logger
+
 
   @impl true
   def mount(_params, _session, socket) do

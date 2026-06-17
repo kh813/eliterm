@@ -3,7 +3,7 @@ defmodule Eliterm.CronManager do
   home/crontab をパースし、Quantum へジョブを登録・管理する GenServer。
   """
   use GenServer
-  require Logger
+
 
   def start_link(opts) do
     session_id = Keyword.fetch!(opts, :session_id)
