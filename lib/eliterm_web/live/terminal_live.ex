@@ -9,7 +9,7 @@ defmodule ElitermWeb.TerminalLive do
       Phoenix.PubSub.subscribe(Eliterm.PubSub, "theme")
       Phoenix.PubSub.subscribe(Eliterm.PubSub, "menu_actions")
     end
-    {:ok, assign(socket, session_id: "default", colors: get_colors(), font: get_font())}
+    {:ok, assign(socket, session_id: "default", colors: get_colors(), font: get_font(), pty_status: :initializing)}
   end
 
 
@@ -31,11 +31,18 @@ defmodule ElitermWeb.TerminalLive do
   @impl true
   def handle_event("terminal_resize", %{"cols" => cols, "rows" => rows}, socket) do
     socket = if not Map.has_key?(socket.assigns, :pty_started) do
-      case Eliterm.start_session(socket.assigns.session_id, cols: cols, rows: rows) do
-        {:ok, _} -> :ok
-        {:error, {:already_started, _}} -> Eliterm.PTY.resize(socket.assigns.session_id, cols, rows)
-      end
-      Phoenix.PubSub.subscribe(Eliterm.PubSub, "pty:#{socket.assigns.session_id}")
+      session_id = socket.assigns.session_id
+      self_pid = self()
+
+      Task.start(fn ->
+        case Eliterm.start_session(session_id, cols: cols, rows: rows) do
+          {:ok, _} -> send(self_pid, :session_started)
+          {:error, {:already_started, _}} -> send(self_pid, :session_started)
+          {:error, reason} -> send(self_pid, {:session_failed, reason})
+        end
+      end)
+
+      Phoenix.PubSub.subscribe(Eliterm.PubSub, "pty:#{session_id}")
       
       # Try to focus the window natively on Mac
       Task.start(fn ->
@@ -43,9 +50,11 @@ defmodule ElitermWeb.TerminalLive do
         Desktop.Window.show(ElitermWindow)
       end)
       
-      assign(socket, pty_started: true)
+      assign(socket, pty_started: true, pty_status: :initializing)
     else
-      Eliterm.PTY.resize(socket.assigns.session_id, cols, rows)
+      if socket.assigns.pty_status == :ready do
+        Eliterm.PTY.resize(socket.assigns.session_id, cols, rows)
+      end
       socket
     end
     {:noreply, socket}
@@ -92,6 +101,17 @@ defmodule ElitermWeb.TerminalLive do
       _ ->
         {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_info(:session_started, socket) do
+    # When session finishes starting, tell JS to focus the terminal
+    {:noreply, assign(socket, pty_status: :ready) |> push_event("session_ready", %{})}
+  end
+
+  @impl true
+  def handle_info({:session_failed, reason}, socket) do
+    {:noreply, assign(socket, pty_status: {:failed, reason})}
   end
 
   @impl true

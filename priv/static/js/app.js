@@ -184,6 +184,13 @@ Hooks.Terminal = {
         this.term.paste(payload.text);
       }
     });
+
+    this.handleEvent("session_ready", () => {
+      console.log("Session is ready! Focusing terminal.");
+      this.fitAddon.fit();
+      window.focus();
+      this.term.focus();
+    });
   }
 };
 

@@ -1,5 +1,25 @@
-<div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; background-color: #000; overflow: hidden;">
+<div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; background-color: #000; overflow: hidden; font-family: monospace;">
   <div style="position: absolute; top: 12px; bottom: 12px; left: 16px; right: 12px;">
     <div id="terminal" phx-update="ignore" phx-hook="Terminal" data-colors={Jason.encode!(@colors)} data-font={@font} style="width: 100%; height: 100%;"></div>
   </div>
+  
+  <%= if @pty_status == :initializing do %>
+    <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #4ade80; z-index: 9999;">
+      <div class="terminal-spinner" style="border: 3px solid rgba(74, 222, 128, 0.1); border-top: 3px solid #4ade80; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+      <div style="margin-top: 16px; font-size: 14px; letter-spacing: 1px;">Initializing container environment...</div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
+  <% end %>
+
+  <%= if match?({:failed, _}, @pty_status) do %>
+    <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; background-color: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ef4444; z-index: 9999; padding: 24px; text-align: center;">
+      <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Failed to start environment</div>
+      <div style="font-size: 13px; color: #9ca3af; max-width: 600px; word-break: break-all;"><%= inspect(elem(@pty_status, 1)) %></div>
+    </div>
+  <% end %>
 </div>
