@@ -25,8 +25,8 @@ using System.Diagnostics;
 class Program {
     static void Main(string[] args) {
         ProcessStartInfo info = new ProcessStartInfo();
-        info.FileName = "bin\\eliterm.bat";
-        info.Arguments = "start";
+        info.FileName = "cmd.exe";
+        info.Arguments = "/c \"bin\\eliterm.bat\" start";
         info.CreateNoWindow = true;
         info.UseShellExecute = false;
         Process.Start(info);
@@ -36,7 +36,7 @@ class Program {
 Set-Content -Path "Launcher.cs" -Value $Source
 
 $csc = (Get-ChildItem -Path "C:\Windows\Microsoft.NET\Framework64" -Filter "csc.exe" -Recurse | Sort-Object LastWriteTime -Descending)[0].FullName
-& $csc /out:"$DistDir\Eliterm.exe" /target:winexe Launcher.cs
+& $csc /out:"$DistDir\Eliterm.exe" /target:winexe /win32icon:"priv\icon.ico" Launcher.cs
 Remove-Item -Force "Launcher.cs"
 
 Write-Host "Windows distribution prepared at $DistDir"
