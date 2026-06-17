@@ -79,12 +79,12 @@ defmodule ElitermWeb.TerminalLive do
 
   @impl true
   def handle_info({:theme_updated, colors}, socket) do
-    {:noreply, push_event(socket, "terminal_theme", %{colors: colors})}
+    {:noreply, assign(socket, colors: colors) |> push_event("terminal_theme", %{colors: colors})}
   end
 
   @impl true
   def handle_info({:font_updated, font}, socket) do
-    {:noreply, push_event(socket, "terminal_font", %{font: font})}
+    {:noreply, assign(socket, font: font) |> push_event("terminal_font", %{font: font})}
   end
 
   @impl true
