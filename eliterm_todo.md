@@ -215,6 +215,7 @@ Version 0.1 / 仕様書 v0.8 対応
 ## Phase 7: GUI安定化・機能補強（v0.1.16）
 
 - [x] `Cmd+C` / `Cmd+V` (Mac) および `Ctrl+C` / `Ctrl+V` (Windows) によるターミナル内のコピペ実装（ネイティブOSクリップボード連携）
+- [x] macOS アプリのメニューバー UI をネイティブらしく改善（App メニュー、Edit メニュー、View メニューのトップレベル配置と、New Terminal 追加）
 - [x] xterm.js の表示領域のバグ修正（vi起動時に一番下のステータス行が見切れる問題の解消）
 - [x] macOS環境でのDocker/Podmanパス自動解決と、Debianコンテナ起動時の `apt-get update` 自動実行対応
 - [ ] その他、安定性向上やマイナーバグ修正

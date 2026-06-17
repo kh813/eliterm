@@ -98,6 +98,12 @@ Hooks.Terminal = {
         this.pushEvent("terminal_input", { data: payload.text });
       }
     });
+
+    this.handleEvent("request_copy", () => {
+      if (this.term.hasSelection()) {
+        this.pushEvent("clipboard_copy", { text: this.term.getSelection() });
+      }
+    });
   }
 };
 

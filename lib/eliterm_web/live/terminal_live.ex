@@ -6,6 +6,7 @@ defmodule ElitermWeb.TerminalLive do
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(Eliterm.PubSub, "theme")
+      Phoenix.PubSub.subscribe(Eliterm.PubSub, "menu_actions")
     end
     {:ok, assign(socket, session_id: "default", colors: get_colors())}
   end
@@ -72,6 +73,21 @@ defmodule ElitermWeb.TerminalLive do
   @impl true
   def handle_info({:theme_updated, colors}, socket) do
     {:noreply, push_event(socket, "terminal_theme", %{colors: colors})}
+  end
+
+  @impl true
+  def handle_info(:menu_copy, socket) do
+    {:noreply, push_event(socket, "request_copy", %{})}
+  end
+
+  @impl true
+  def handle_info(:menu_paste, socket) do
+    case Eliterm.Clipboard.paste() do
+      {:ok, text} when text != "" ->
+        {:noreply, push_event(socket, "terminal_paste", %{text: text})}
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   @impl true

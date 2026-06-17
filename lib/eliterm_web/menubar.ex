@@ -17,6 +17,24 @@ defmodule ElitermWeb.MenuBar do
     {:noreply, menu}
   end
 
+  def handle_event("new_terminal", menu) do
+    # On Mac, open a new instance using the open command
+    if match?({:unix, :darwin}, :os.type()) do
+      System.cmd("open", ["-n", "-a", "Eliterm"])
+    end
+    {:noreply, menu}
+  end
+
+  def handle_event("copy", menu) do
+    Phoenix.PubSub.broadcast(Eliterm.PubSub, "menu_actions", :menu_copy)
+    {:noreply, menu}
+  end
+
+  def handle_event("paste", menu) do
+    Phoenix.PubSub.broadcast(Eliterm.PubSub, "menu_actions", :menu_paste)
+    {:noreply, menu}
+  end
+
   def handle_event("set_theme_" <> theme, menu) do
     colors = case theme do
       "default" -> %{}
@@ -54,9 +72,15 @@ defmodule ElitermWeb.MenuBar do
   @impl true
   def render(assigns) do
     ~H"""
-    <menu id="menubar">
+    <menubar>
       <menu label="Eliterm">
+        <item onclick="new_terminal" shortcut="Cmd+N">New Terminal</item>
+        <hr/>
         <item onclick="quit" shortcut="Cmd+Q">Quit</item>
+      </menu>
+      <menu label="Edit">
+        <item onclick="copy" shortcut="Cmd+C">Copy</item>
+        <item onclick="paste" shortcut="Cmd+V">Paste</item>
       </menu>
       <menu label="View">
         <menu label="Color Scheme">
@@ -68,7 +92,7 @@ defmodule ElitermWeb.MenuBar do
           <item onclick="set_theme_gruvbox_light">Gruvbox Light (Soft)</item>
         </menu>
       </menu>
-    </menu>
+    </menubar>
     """
   end
 end
