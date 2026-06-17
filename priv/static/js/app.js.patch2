@@ -1,0 +1,24 @@
+--- priv/static/js/app.js
++++ priv/static/js/app.js
+@@ -107,6 +107,24 @@
+     };
+     window.addEventListener("resize", this.resizeHandler);
+ 
++    // Global capture for Cmd+C / Cmd+V to bypass WebKit native consumption
++    window.addEventListener('keydown', (e) => {
++      if ((e.code === 'KeyC' || e.key.toLowerCase() === 'c') && (e.metaKey || e.ctrlKey)) {
++        if (this.term && this.term.hasSelection()) {
++          const text = this.term.getSelection();
++          if (navigator.clipboard) {
++            navigator.clipboard.writeText(text).catch(err => console.error(err));
++          }
++          this.pushEvent("clipboard_copy", { text: text });
++          e.preventDefault();
++          e.stopPropagation();
++        }
++      }
++    }, true);
++
+     this.term.attachCustomKeyEventHandler((e) => {
+       // Ignore Ctrl+Shift+C / Ctrl+Shift+V
+       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code === 'KeyC' || e.code === 'KeyV')) {

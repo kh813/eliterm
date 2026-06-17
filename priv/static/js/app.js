@@ -114,6 +114,36 @@ Hooks.Terminal = {
       this.term.focus();
     }, 100);
 
+    // Global capture for Cmd+C / Cmd+V to bypass WebKit native consumption
+    window.addEventListener('keydown', (e) => {
+      // Cmd+C
+      if ((e.code === 'KeyC' || e.key.toLowerCase() === 'c') && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        if (this.term && this.term.hasSelection()) {
+          const text = this.term.getSelection();
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).catch(err => console.error(err));
+          }
+          this.pushEvent("clipboard_copy", { text: text });
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+      // Cmd+V
+      if ((e.code === 'KeyV' || e.key.toLowerCase() === 'v') && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        if (navigator.clipboard) {
+          navigator.clipboard.readText().then(text => {
+            if (this.term) this.term.paste(text);
+          }).catch(() => {
+            this.pushEvent("clipboard_paste", {});
+          });
+        } else {
+          this.pushEvent("clipboard_paste", {});
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
     // Custom Key Event Handler for Copy & Paste
     this.term.attachCustomKeyEventHandler(async (e) => {
       // Cmd+C or Ctrl+C to copy if text is selected

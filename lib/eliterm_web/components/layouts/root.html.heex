@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
     <title>Eliterm</title>
-    <link rel="stylesheet" href="/vendor/xterm.css" />
-    <link rel="stylesheet" href="/css/app.css" />
-    <script defer type="text/javascript" src="/vendor/xterm.js"></script>
-    <script defer type="text/javascript" src="/vendor/xterm-addon-fit.js"></script>
-    <script defer type="text/javascript" src="/vendor/phoenix.js"></script>
-    <script defer type="text/javascript" src="/vendor/phoenix_live_view.js"></script>
-    <script defer type="text/javascript" src="/js/app.js"></script>
+    <link rel="stylesheet" href={"/vendor/xterm.css?v=#{System.system_time(:second)}"} />
+    <link rel="stylesheet" href={"/css/app.css?v=#{System.system_time(:second)}"} />
+    <script defer type="text/javascript" src={"/vendor/xterm.js?v=#{System.system_time(:second)}"}></script>
+    <script defer type="text/javascript" src={"/vendor/xterm-addon-fit.js?v=#{System.system_time(:second)}"}></script>
+    <script defer type="text/javascript" src={"/vendor/phoenix.js?v=#{System.system_time(:second)}"}></script>
+    <script defer type="text/javascript" src={"/vendor/phoenix_live_view.js?v=#{System.system_time(:second)}"}></script>
+    <script defer type="text/javascript" src={"/js/app.js?v=#{System.system_time(:second)}"}></script>
   </head>
   <body class="bg-gray-900 text-white font-sans antialiased w-full h-full overflow-hidden m-0 p-0">
     <%= @inner_content %>

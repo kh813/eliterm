@@ -1,0 +1,12 @@
+.xterm .xterm-helper-textarea {
+    position: absolute;
+    opacity: 0.01;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    z-index: -5;
+    white-space: nowrap;
+    overflow: hidden;
+    resize: none;
+}
