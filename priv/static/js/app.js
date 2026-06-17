@@ -117,16 +117,28 @@ Hooks.Terminal = {
     // Custom Key Event Handler for Copy & Paste
     this.term.attachCustomKeyEventHandler(async (e) => {
       // Cmd+C or Ctrl+C to copy if text is selected
-      if (e.type === 'keydown' && e.code === 'KeyC' && (e.metaKey || e.ctrlKey)) {
+      if (e.type === 'keydown' && (e.code === 'KeyC' || e.key.toLowerCase() === 'c') && (e.metaKey || e.ctrlKey)) {
         if (this.term.hasSelection()) {
-          this.pushEvent("clipboard_copy", { text: this.term.getSelection() });
+          const text = this.term.getSelection();
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).catch(err => console.error(err));
+          }
+          this.pushEvent("clipboard_copy", { text: text });
           return false; // Prevent default so it doesn't send Ctrl+C to the shell if selected
         }
       }
       
       // Cmd+V or Ctrl+V to paste
-      if (e.type === 'keydown' && e.code === 'KeyV' && (e.metaKey || e.ctrlKey)) {
-        this.pushEvent("clipboard_paste", {});
+      if (e.type === 'keydown' && (e.code === 'KeyV' || e.key.toLowerCase() === 'v') && (e.metaKey || e.ctrlKey)) {
+        if (navigator.clipboard) {
+          navigator.clipboard.readText().then(text => {
+            this.pushEvent("terminal_input", { data: text });
+          }).catch(() => {
+            this.pushEvent("clipboard_paste", {});
+          });
+        } else {
+          this.pushEvent("clipboard_paste", {});
+        }
         return false;
       }
       return true;
