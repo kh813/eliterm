@@ -1,6 +1,7 @@
 defmodule ElitermClipboardTest do
   use ExUnit.Case
 
+  @tag :skip_on_ci
   test "can copy and paste text via native OS clipboard (Windows/Mac support)" do
     # Ensure wx is running since Eliterm.Clipboard depends on it
     if :wx.is_null(:wx.null()) do
