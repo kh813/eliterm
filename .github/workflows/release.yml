@@ -19,7 +19,9 @@ jobs:
       - name: Set up Elixir (brew)
         run: brew install erlang elixir
       - name: Install dependencies
-        run: mix deps.get
+        run: |
+          mix deps.get
+          mix deps.compile
       - name: Run tests and check compilation
         run: |
           mix compile --warnings-as-errors
