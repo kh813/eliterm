@@ -15,8 +15,11 @@ Hooks.Terminal = {
       theme: Object.assign({
         background: '#000000',
         foreground: '#e5e5e5',
-        cursor: '#4ade80'
-      }, colors)
+        cursor: '#4ade80',
+        selectionBackground: 'rgba(255, 255, 255, 0.3)'
+      }, colors),
+      macOptionClickForcesSelection: true,
+      macOptionIsMeta: true
     });
     
     if (colors.background) {
