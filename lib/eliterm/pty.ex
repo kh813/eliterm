@@ -34,12 +34,18 @@ defmodule Eliterm.PTY do
     File.mkdir_p!(home_dir)
 
     bashrc_path = Path.join(home_dir, ".bashrc")
-    unless File.exists?(bashrc_path) do
-      trap_code = """
-      trap 'pwd > ~/.session/cwd; env > ~/.session/env; declare -p > ~/.session/vars; alias > ~/.session/aliases' SIGUSR1
-      export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-      """
-      File.write!(bashrc_path, trap_code)
+    trap_code_part = """
+    trap 'pwd > ~/.session/cwd; env > ~/.session/env; declare -p > ~/.session/vars; alias > ~/.session/aliases' SIGUSR1
+    export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+    bind 'set enable-active-region off' 2>/dev/null || true
+    """
+    if not File.exists?(bashrc_path) do
+      File.write!(bashrc_path, trap_code_part)
+    else
+      bashrc_content = File.read!(bashrc_path)
+      unless String.contains?(bashrc_content, "enable-active-region") do
+        File.write!(bashrc_path, bashrc_content <> "\n" <> "bind 'set enable-active-region off' 2>/dev/null || true\n")
+      end
     end
 
     sock_path = Path.join([home_dir, "..", ".session", "eliterm.sock"]) |> Path.expand()

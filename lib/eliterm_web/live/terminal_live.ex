@@ -1,5 +1,6 @@
 defmodule ElitermWeb.TerminalLive do
   use ElitermWeb, :live_view
+  require Logger
 
 
   @impl true
@@ -52,6 +53,7 @@ defmodule ElitermWeb.TerminalLive do
 
   @impl true
   def handle_event("clipboard_copy", %{"text" => text}, socket) do
+    Logger.info("Received clipboard_copy event with text: #{inspect(text)}")
     Eliterm.Clipboard.copy(text)
     {:noreply, socket}
   end
@@ -78,6 +80,7 @@ defmodule ElitermWeb.TerminalLive do
 
   @impl true
   def handle_info(:menu_copy, socket) do
+    Logger.info("Received :menu_copy broadcast, pushing request_copy event to JS")
     {:noreply, push_event(socket, "request_copy", %{})}
   end
 

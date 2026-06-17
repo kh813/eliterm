@@ -13,6 +13,21 @@ defmodule ElitermClipboardTest do
     assert :ok == Eliterm.Clipboard.copy(test_string)
     
     # 2. Verify we can paste and it matches exactly what was copied
-    assert {:ok, ^test_string} = Eliterm.Clipboard.paste()
+    assert_eventually(fn ->
+      Eliterm.Clipboard.paste() == {:ok, test_string}
+    end)
+  end
+
+  defp assert_eventually(fun, retries \\ 20) do
+    if fun.() do
+      true
+    else
+      if retries > 0 do
+        Process.sleep(50)
+        assert_eventually(fun, retries - 1)
+      else
+        flunk("Assertion failed: clipboard did not update to the expected value.")
+      end
+    end
   end
 end

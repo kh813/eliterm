@@ -18,11 +18,37 @@ defmodule Eliterm.Clipboard do
   end
 
   def copy(text) when is_binary(text) do
-    GenServer.call(__MODULE__, {:copy, text})
+    if match?({:unix, :darwin}, :os.type()) do
+      try do
+        port = Port.open({:spawn, "pbcopy"}, [:binary])
+        Port.command(port, text)
+        Port.close(port)
+        :ok
+      rescue
+        e ->
+          Logger.error("Failed to copy using pbcopy: #{inspect(e)}")
+          {:error, e}
+      end
+    else
+      GenServer.call(__MODULE__, {:copy, text})
+    end
   end
 
   def paste do
-    GenServer.call(__MODULE__, :paste)
+    if match?({:unix, :darwin}, :os.type()) do
+      try do
+        case System.cmd("pbpaste", []) do
+          {out, 0} -> {:ok, out}
+          {_, status} -> {:error, {:pbpaste_failed, status}}
+        end
+      rescue
+        e ->
+          Logger.error("Failed to paste using pbpaste: #{inspect(e)}")
+          {:error, e}
+      end
+    else
+      GenServer.call(__MODULE__, :paste)
+    end
   end
 
   def handle_call({:copy, text}, _from, state) do
@@ -36,19 +62,6 @@ defmodule Eliterm.Clipboard do
     e -> {:reply, {:error, e}, state}
   end
 
-  defp do_copy(_clipboard, _text, 0), do: {:error, :clipboard_open_failed}
-  defp do_copy(clipboard, text, retries) do
-    if :wxClipboard.open(clipboard) do
-      data_obj = :wxTextDataObject.new(text: text)
-      :wxClipboard.setData(clipboard, data_obj)
-      :wxClipboard.close(clipboard)
-      :ok
-    else
-      Process.sleep(50)
-      do_copy(clipboard, text, retries - 1)
-    end
-  end
-
   def handle_call(:paste, _from, state) do
     clipboard = :wxClipboard.get()
     result = do_paste(clipboard, 10)
@@ -58,6 +71,23 @@ defmodule Eliterm.Clipboard do
     {:reply, result, state}
   rescue
     e -> {:reply, {:error, e}, state}
+  end
+
+  defp do_copy(_clipboard, _text, 0), do: {:error, :clipboard_open_failed}
+  defp do_copy(clipboard, text, retries) do
+    if :wxClipboard.open(clipboard) do
+      data_obj = :wxTextDataObject.new(text: text)
+      if :wxClipboard.setData(clipboard, data_obj) do
+        :wxClipboard.flush(clipboard)
+      else
+        Logger.error("wxClipboard.setData returned false")
+      end
+      :wxClipboard.close(clipboard)
+      :ok
+    else
+      Process.sleep(50)
+      do_copy(clipboard, text, retries - 1)
+    end
   end
 
   defp do_paste(_clipboard, 0), do: {:error, :clipboard_open_failed}

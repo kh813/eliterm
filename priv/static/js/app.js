@@ -116,30 +116,54 @@ Hooks.Terminal = {
 
 
     // Custom Key Event Handler for Copy & Paste
-    this.term.attachCustomKeyEventHandler(async (e) => {
-      // Ignore Ctrl+Shift+C / Ctrl+Shift+V
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code === 'KeyC' || e.code === 'KeyV')) {
+    this.term.attachCustomKeyEventHandler((e) => {
+      const isCopy = (e.ctrlKey || e.metaKey) && e.code === 'KeyC';
+      const isPaste = (e.ctrlKey || e.metaKey) && e.code === 'KeyV';
+
+      if (isCopy) {
+        console.log("Custom key handler intercepted Copy, hasSelection:", this.term.hasSelection());
+        if (this.term.hasSelection()) {
+          const text = this.term.getSelection();
+          console.log("Pushing clipboard_copy from key handler:", text);
+          this.pushEvent("clipboard_copy", { text: text });
+        }
+        return false; // Prevent xterm.js / browser default copy handling (which fails)
+      }
+
+      if (isPaste) {
+        // Let the OS native paste handle it naturally inside the webview (pastes once).
+        // Do not push clipboard_paste to Elixir to prevent double pasting.
         return true; 
       }
+
       return true;
     });
 
     // Also listen to native copy events in case the terminal isn't perfectly focused
     window.addEventListener('copy', (e) => {
+      console.log("window copy event triggered, hasSelection:", this.term.hasSelection());
       if (this.term.hasSelection()) {
-        this.pushEvent("clipboard_copy", { text: this.term.getSelection() });
-        e.preventDefault();
+        const text = this.term.getSelection();
+        // Do not prevent default! Let the browser natively copy the textarea text.
+        console.log("Pushing clipboard_copy event from window listener:", text);
+        this.pushEvent("clipboard_copy", { text: text });
       }
     });
 
     // Handle incoming events from LiveView
     this.handleEvent("request_copy", () => {
+      console.log("request_copy event received from LiveView, hasSelection:", this.term.hasSelection());
       if (this.term.hasSelection()) {
         const text = this.term.getSelection();
         if (navigator.clipboard) {
-          navigator.clipboard.writeText(text).catch(err => console.error(err));
+          navigator.clipboard.writeText(text)
+            .then(() => console.log("Successfully wrote selection to navigator.clipboard"))
+            .catch(err => console.error("Failed to write to navigator.clipboard:", err));
         }
+        console.log("Pushing clipboard_copy event from request_copy:", text);
         this.pushEvent("clipboard_copy", { text: text });
+      } else {
+        console.warn("request_copy called but no selection exists in terminal");
       }
     });
 

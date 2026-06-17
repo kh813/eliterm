@@ -1,5 +1,6 @@
 defmodule ElitermWeb.MenuBar do
   use Desktop.Menu
+  require Logger
 
   @impl true
   def mount(menu) do
@@ -33,6 +34,7 @@ defmodule ElitermWeb.MenuBar do
   end
 
   def handle_event("copy", menu) do
+    Logger.info("MenuBar handle_event(\"copy\") called")
     Phoenix.PubSub.broadcast(Eliterm.PubSub, "menu_actions", :menu_copy)
     {:noreply, menu}
   end
