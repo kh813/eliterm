@@ -31,6 +31,18 @@ defmodule Eliterm.ContainerWorker do
   end
 
   @impl true
+  def handle_info({:EXIT, _port, :normal}, state) do
+    # Ignore normal exit messages of temporary ports spawned by System.cmd
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info(msg, state) do
+    Logger.debug("ContainerWorker received unexpected message: #{inspect(msg)}")
+    {:noreply, state}
+  end
+
+  @impl true
   def terminate(_reason, state) do
     Logger.info("Stopping container for session #{state.session_id}...")
     Eliterm.Container.Engine.stop_session_container(state.session_id)
