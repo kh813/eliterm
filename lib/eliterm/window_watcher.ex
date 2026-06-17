@@ -15,7 +15,7 @@ defmodule Eliterm.WindowWatcher do
     case Process.whereis(ElitermWindow) do
       nil ->
         if state.shown do
-          System.halt(0)
+          System.stop(0)
         end
         Process.send_after(self(), :check, 1000)
         {:noreply, state}
@@ -48,7 +48,7 @@ defmodule Eliterm.WindowWatcher do
           else
             if state.shown do
               # The window was shown and is now hidden or destroyed!
-              System.halt(0)
+              System.stop(0)
             end
             Process.send_after(self(), :check, 1000)
             {:noreply, state}
@@ -56,7 +56,7 @@ defmodule Eliterm.WindowWatcher do
         catch
           _, _ ->
             if state.shown do
-              System.halt(0)
+              System.stop(0)
             end
             Process.send_after(self(), :check, 1000)
             {:noreply, state}

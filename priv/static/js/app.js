@@ -11,8 +11,9 @@ Hooks.Terminal = {
       cursorBlink: true,
       fontFamily: finalFont,
       fontSize: 14,
+      allowTransparency: false,
       theme: Object.assign({
-        background: 'transparent',
+        background: '#000000',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors)
@@ -31,6 +32,14 @@ Hooks.Terminal = {
 
     this.term.open(this.el);
     this.fitAddon.fit();
+    
+    // Ensure correct alignment after fonts load
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        this.fitAddon.fit();
+        this.pushEvent("terminal_resize", { cols: this.term.cols, rows: this.term.rows });
+      });
+    }
 
     // Handle terminal input
     this.term.onData(data => {
@@ -53,7 +62,7 @@ Hooks.Terminal = {
     this.handleEvent("terminal_theme", payload => {
       let colors = payload.colors;
       this.term.options.theme = Object.assign({
-        background: 'transparent',
+        background: '#000000',
         foreground: '#e5e5e5',
         cursor: '#4ade80'
       }, colors);

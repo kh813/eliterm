@@ -15,7 +15,9 @@ class WinSleepWatcher {
         Thread readerThread = new Thread(() => {
             while (true) {
                 string line = Console.ReadLine();
-                if (line == null) break; // EOF
+                if (line == null) {
+                    Environment.Exit(0);
+                }
                 if (line.Trim() == "MIGRATION_DONE") {
                     migrationDoneEvent.Set();
                 }

@@ -12,6 +12,12 @@ class SleepWatcher {
         // Print ready
         print("READY")
         fflush(stdout)
+
+        // Watch for EOF on stdin to exit when parent dies
+        DispatchQueue.global().async {
+            while let _ = readLine() {}
+            exit(0)
+        }
     }
 
     @objc func willSleep(_ notification: Notification) {
