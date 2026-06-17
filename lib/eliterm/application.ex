@@ -35,7 +35,10 @@ defmodule Eliterm.Application do
          app: :eliterm,
          id: ElitermWindow,
          title: "Eliterm",
-         size: {1000, 700},
+         size: {
+           Eliterm.Config.get(["gui", "window", "width"], 1000),
+           Eliterm.Config.get(["gui", "window", "height"], 700)
+         },
          url: "http://localhost:#{port}",
          icon: "icon.png",
          menubar: ElitermWeb.MenuBar

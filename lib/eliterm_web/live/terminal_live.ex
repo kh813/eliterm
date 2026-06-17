@@ -14,27 +14,11 @@ defmodule ElitermWeb.TerminalLive do
 
 
   defp get_colors do
-    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
-    if File.exists?(path) do
-      case Toml.decode_file(path) do
-        {:ok, parsed} -> get_in(parsed, ["gui", "colors"]) || %{}
-        _ -> %{}
-      end
-    else
-      %{}
-    end
+    Eliterm.Config.get(["gui", "colors"], %{})
   end
 
   defp get_font do
-    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
-    if File.exists?(path) do
-      case Toml.decode_file(path) do
-        {:ok, parsed} -> get_in(parsed, ["gui", "font"]) || ""
-        _ -> ""
-      end
-    else
-      ""
-    end
+    Eliterm.Config.get(["gui", "font"], "")
   end
 
   @impl true

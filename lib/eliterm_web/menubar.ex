@@ -60,6 +60,7 @@ defmodule ElitermWeb.MenuBar do
       "menlo" -> "Menlo"
       "monaco" -> "Monaco"
       "consolas" -> "Consolas"
+      "cascadia_code" -> "Cascadia Code"
       "fira_code" -> "Fira Code"
       "source_code_pro" -> "Source Code Pro"
       "hack" -> "Hack"
@@ -71,55 +72,32 @@ defmodule ElitermWeb.MenuBar do
   end
 
   defp update_toml_colors(colors) do
-    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
-    File.mkdir_p!(Path.dirname(path))
-    
-    content = if File.exists?(path), do: File.read!(path), else: ""
-    
-    # Strip existing [gui.colors] section
-    content = String.replace(content, ~r/\[gui\.colors\][^\[]*/s, "")
-    
-    # Append new [gui.colors]
-    if colors != %{} do
-      color_lines = Enum.map(colors, fn {k, v} -> "#{k} = \"#{v}\"" end)
-      new_section = "\n[gui.colors]\n" <> Enum.join(color_lines, "\n") <> "\n"
-      File.write!(path, String.trim(content) <> "\n" <> new_section)
+    if colors == %{} do
+      Eliterm.Config.put(["gui", "colors"], %{})
     else
-      File.write!(path, String.trim(content) <> "\n")
+      Eliterm.Config.put(["gui", "colors"], colors)
     end
   end
 
   defp update_toml_font(font) do
-    path = Path.join([Eliterm.base_dir(), "eliterm.toml"])
-    File.mkdir_p!(Path.dirname(path))
-    
-    content = if File.exists?(path), do: File.read!(path), else: ""
-    
-    # Simple regex to replace or add [gui] font line. If [gui] doesn't exist, we just append it.
-    # Note: parsing and rewriting TOML properly is hard, so we do a simple regex for `font = "..."`
-    # For a robust solution, we should parse the whole TOML, but since eliterm.toml is managed here it's okay.
-    content = String.replace(content, ~r/\n?\[gui\]\nfont = "[^"]*"/, "")
-    
-    if font != "" do
-      new_section = "\n[gui]\nfont = \"#{font}\"\n"
-      File.write!(path, String.trim(content) <> "\n" <> new_section)
-    else
-      File.write!(path, String.trim(content) <> "\n")
-    end
+    Eliterm.Config.put(["gui", "font"], font)
   end
 
   @impl true
   def render(assigns) do
+    cmd_key = if match?({:unix, :darwin}, :os.type()), do: "Cmd", else: "Ctrl"
+    assigns = Map.put_new(assigns, :cmd_key, cmd_key)
+
     ~H"""
     <menubar>
       <menu label="Eliterm">
-        <item onclick="new_terminal" shortcut="Cmd+N">New Terminal</item>
+        <item onclick="new_terminal" shortcut={"#{@cmd_key}+N"}>New Terminal</item>
         <hr/>
-        <item onclick="quit" shortcut="Cmd+Q">Quit</item>
+        <item onclick="quit" shortcut={"#{@cmd_key}+Q"}>Quit</item>
       </menu>
       <menu label="Edit">
-        <item onclick="copy" shortcut="Cmd+C">Copy</item>
-        <item onclick="paste" shortcut="Cmd+V">Paste</item>
+        <item onclick="copy" shortcut={"#{@cmd_key}+C"}>Copy</item>
+        <item onclick="paste" shortcut={"#{@cmd_key}+V"}>Paste</item>
       </menu>
       <menu label="View">
         <menu label="Font">
@@ -128,6 +106,7 @@ defmodule ElitermWeb.MenuBar do
           <item onclick="set_font_menlo">Menlo</item>
           <item onclick="set_font_monaco">Monaco</item>
           <item onclick="set_font_consolas">Consolas</item>
+          <item onclick="set_font_cascadia_code">Cascadia Code</item>
           <item onclick="set_font_fira_code">Fira Code</item>
           <item onclick="set_font_source_code_pro">Source Code Pro</item>
           <item onclick="set_font_hack">Hack</item>

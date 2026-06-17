@@ -8,13 +8,13 @@ defmodule Eliterm.WindowWatcher do
   def init(:init) do
     # Start polling after 2 seconds
     Process.send_after(self(), :check, 2000)
-    {:ok, :hidden}
+    {:ok, %{shown: false, last_bounds: nil}}
   end
 
   def handle_info(:check, state) do
     case Process.whereis(ElitermWindow) do
       nil ->
-        if state == :shown do
+        if state.shown do
           System.halt(0)
         end
         Process.send_after(self(), :check, 1000)
@@ -26,10 +26,27 @@ defmodule Eliterm.WindowWatcher do
           frame = ui_state.frame
 
           if frame != nil and :wxFrame.isShown(frame) do
+            if not state.shown do
+              # First time the window is shown, restore position
+              x = Eliterm.Config.get(["gui", "window", "x"])
+              y = Eliterm.Config.get(["gui", "window", "y"])
+              if x != nil and y != nil do
+                :wxWindow.move(frame, {x, y})
+              end
+            end
+
+            {w, h} = :wxWindow.getSize(frame)
+            {x, y} = :wxWindow.getPosition(frame)
+            bounds = %{"width" => w, "height" => h, "x" => x, "y" => y}
+
+            if state.shown and state.last_bounds != nil and state.last_bounds != bounds do
+              Eliterm.Config.put(["gui", "window"], bounds)
+            end
+
             Process.send_after(self(), :check, 1000)
-            {:noreply, :shown}
+            {:noreply, %{state | shown: true, last_bounds: bounds}}
           else
-            if state == :shown do
+            if state.shown do
               # The window was shown and is now hidden or destroyed!
               System.halt(0)
             end
@@ -38,7 +55,7 @@ defmodule Eliterm.WindowWatcher do
           end
         catch
           _, _ ->
-            if state == :shown do
+            if state.shown do
               System.halt(0)
             end
             Process.send_after(self(), :check, 1000)
