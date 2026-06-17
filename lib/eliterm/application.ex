@@ -7,6 +7,12 @@ defmodule Eliterm.Application do
 
   @impl true
   def start(_type, _args) do
+    port = get_free_port()
+    
+    endpoint_config = Application.get_env(:eliterm, ElitermWeb.Endpoint)
+    http_opts = Keyword.get(endpoint_config, :http, []) |> Keyword.put(:port, port)
+    Application.put_env(:eliterm, ElitermWeb.Endpoint, Keyword.put(endpoint_config, :http, http_opts))
+
     topologies = [
       eliterm_cluster: [
         strategy: Cluster.Strategy.Gossip
@@ -24,7 +30,7 @@ defmodule Eliterm.Application do
          id: ElitermWindow,
          title: "Eliterm",
          size: {1000, 700},
-         url: "http://localhost:4000",
+         url: "http://localhost:#{port}",
          icon: "icon.png",
          menubar: ElitermWeb.MenuBar
        ]},
@@ -40,5 +46,12 @@ defmodule Eliterm.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Eliterm.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp get_free_port do
+    {:ok, socket} = :gen_tcp.listen(0, [:inet, ip: {127, 0, 0, 1}])
+    {:ok, port} = :inet.port(socket)
+    :gen_tcp.close(socket)
+    port
   end
 end
