@@ -72,3 +72,5 @@
   - `TerminalLive` の表示領域計算のバグを修正（flexレイアウトとbox-sizingの調整により、vi等で最下行が見切れる問題を解決）。
   - macOSの GUIアプリから起動した場合でも Docker Desktop/Podman を正しく検出できるよう、`/opt/homebrew/bin/` 等のパス探索ロジックを追加。
   - コンテナ（Debian）起動時に自動で `apt-get update` を実行し、ユーザーがすぐに `apt-get install` できるよう改善。
+  - ターミナル描画の `FitAddon` と Phoenix LiveView のコンテナ高さ (`data-phx-main`) の不一致により発生していたリサイズの無限ループ（1行に縮むバグや画面フリーズ）を、`position: absolute` を用いた明示的なウィンドウ境界へのピン留めにより完全に解消。
+  - 本件のようなUI/UX変更によるデグレを防ぐため、`ANTIGRAVITY.md` に「リリース・タグプッシュ前のローカル動作テスト（目視確認）の必須化」を追加。
