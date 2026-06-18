@@ -152,6 +152,27 @@ defmodule Eliterm.Container.Engine do
     System.cmd(bin, ["exec", container_name, "apt-get", "update"])
     create_container_user(bin, container_name)
     System.cmd(bin, ["exec", container_name, "mkdir", "-p", "/home/user"])
+
+    # Install netcat-openbsd in container to allow socket communication
+    System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y", "netcat-openbsd"])
+
+    # Write proxy script to host and copy it to container
+    proxy_script = """
+    #!/bin/sh
+    SOCKET_PATH="/home/user/.eliterm-cli.sock"
+    if [ ! -S "$SOCKET_PATH" ]; then
+      echo "Error: Eliterm CLI socket not found. Make sure you are inside an active Eliterm session." >&2
+      exit 1
+    fi
+    (printf '%d\\n' "$#"; printf '%s\\0' "$@"; cat) | nc -U "$SOCKET_PATH"
+    """
+
+    tmp_path = Path.join(home_dir, ".eliterm-proxy-tmp")
+    File.write!(tmp_path, proxy_script)
+    System.cmd(bin, ["cp", tmp_path, "#{container_name}:/usr/local/bin/eliterm"])
+    File.rm!(tmp_path)
+
+    System.cmd(bin, ["exec", container_name, "chmod", "+x", "/usr/local/bin/eliterm"])
     
     apps_file = Path.join(home_dir, ".eliterm-apps")
     if File.exists?(apps_file) do

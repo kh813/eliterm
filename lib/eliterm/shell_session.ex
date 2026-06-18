@@ -26,7 +26,8 @@ defmodule Eliterm.ShellSession do
     children = [
       {Eliterm.ContainerWorker, [session_id: session_id, home_dir: home_dir]},
       Supervisor.child_spec({Eliterm.PTY, [session_id: session_id, home_dir: home_dir]}, restart: :transient),
-      {Eliterm.CronManager, [session_id: session_id, home_dir: home_dir]}
+      {Eliterm.CronManager, [session_id: session_id, home_dir: home_dir]},
+      {Eliterm.CLIProxyServer, [session_id: session_id, home_dir: home_dir]}
     ]
 
     # ContainerWorker is first, and if it crashes, restart everything.
