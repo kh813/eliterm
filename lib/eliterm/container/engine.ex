@@ -115,8 +115,6 @@ defmodule Eliterm.Container.Engine do
       # Try to start existing container first
       case System.cmd(bin, ["start", container_name]) do
         {_, 0} ->
-          # Ensure proxy script and netcat are present even when reusing container
-          ensure_proxy_installed(bin, container_name, home_dir)
           {:ok, container_name}
         _ ->
           # Container does not exist or failed to start, create a new one
@@ -154,71 +152,12 @@ defmodule Eliterm.Container.Engine do
     System.cmd(bin, ["exec", container_name, "apt-get", "update"])
     create_container_user(bin, container_name)
     System.cmd(bin, ["exec", container_name, "mkdir", "-p", "/home/user"])
-
-    ensure_proxy_installed(bin, container_name, home_dir)
     
     apps_file = Path.join(home_dir, ".eliterm-apps")
     if File.exists?(apps_file) do
       Logger.info("Installing packages from .eliterm-apps for #{container_name}")
       install_packages(bin, container_name, apps_file)
     end
-  end
-
-  defp ensure_proxy_installed(bin, container_name, home_dir) do
-    # Check if netcat is already installed, if not install it
-    case System.cmd(bin, ["exec", container_name, "which", "nc"]) do
-      {_, 0} ->
-        :ok
-      _ ->
-        Logger.info("Installing netcat-openbsd inside container #{container_name}...")
-        System.cmd(bin, ["exec", container_name, "apt-get", "update"])
-        System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y", "netcat-openbsd"])
-    end
-
-    # Write proxy script to host and copy it to container as 'admin' command
-    proxy_script = """
-    #!/bin/sh
-    PORT_FILE="/home/user/.eliterm-cli.port"
-    if [ ! -f "$PORT_FILE" ]; then
-      echo "Error: Eliterm CLI port file not found. Make sure you are inside an active Eliterm session." >&2
-      exit 1
-    fi
-
-    PORT=$(head -n 1 "$PORT_FILE")
-    TOKEN=$(tail -n 1 "$PORT_FILE")
-
-    # Find the host gateway IP address
-    if grep -q "host.docker.internal" /etc/hosts; then
-      HOST_IP="host.docker.internal"
-    elif grep -q "host.containers.internal" /etc/hosts; then
-      HOST_IP="host.containers.internal"
-    elif command -v ip >/dev/null 2>&1; then
-      HOST_IP=$(ip route show | awk '/default/ {print $3}')
-    else
-      HEX_GW=$(awk '$2=="00000000" {print $3}' /proc/net/route)
-      if [ -n "$HEX_GW" ]; then
-        HOST_IP=$(printf "%d.%d.%d.%d" \\
-          0x$(echo "$HEX_GW" | cut -c 7-8) \\
-          0x$(echo "$HEX_GW" | cut -c 5-6) \\
-          0x$(echo "$HEX_GW" | cut -c 3-4) \\
-          0x$(echo "$HEX_GW" | cut -c 1-2))
-      else
-        HOST_IP="10.0.2.2"
-      fi
-    fi
-
-    (printf '%s\\n' "$TOKEN"; printf '%d\\n' "$#"; printf '%s\\0' "$@"; cat) | nc -w 5 "$HOST_IP" "$PORT"
-    """
-
-    tmp_path = Path.join(home_dir, ".eliterm-proxy-tmp")
-    File.write!(tmp_path, proxy_script)
-    System.cmd(bin, ["cp", tmp_path, "#{container_name}:/usr/local/bin/admin"])
-    File.rm!(tmp_path)
-
-    System.cmd(bin, ["exec", container_name, "chmod", "+x", "/usr/local/bin/admin"])
-    
-    # Create symlink for 'eliterm' for compatibility
-    System.cmd(bin, ["exec", container_name, "ln", "-sf", "/usr/local/bin/admin", "/usr/local/bin/eliterm"])
   end
 
   defp create_container_user(bin, container_name) do

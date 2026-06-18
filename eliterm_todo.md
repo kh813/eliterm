@@ -252,7 +252,6 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `eliterm cluster rename <prefix>` の実装：動作中にノード名接頭辞を動的変更し、設定ファイルに保存
 - [x] `eliterm cluster info` の実装：ノード名とクッキーの現在値を表示
 - [x] `eliterm cluster init` 実行時に既に初期化済みの場合の確認プロンプト（re-init確認）の実装
-- [x] ゲスト（コンテナ）内からの `eliterm` コマンドプロキシの実装：Unixドメインソケット経由でホスト側のデーモンに接続し、コンテナ内から直接 `cluster init` などのホスト特権コマンドを実行可能に改善
 
 ---
 

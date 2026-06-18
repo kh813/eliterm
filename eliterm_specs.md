@@ -948,27 +948,6 @@ eliterm cluster leave
 - クラスタ参加には共有シークレット（cookie）を要求
 - mTLS は将来バージョンで対応
 
-### 12.4 ゲストセッション内からのホスト管理（adminコマンド）
-
-Eliterm のターミナルセッションはホストから隔離されたコンテナ（Debian slim）で実行されますが、ゲスト内からホスト側のクラスタ操作や管理を行うための内蔵コマンドとして **`admin`** コマンドが提供されます。
-
-#### 1. 仕組み（TCPポート中継プロキシ）
-- セッションの起動時、ホスト側のセッションスーパーバイザー配下に **`Eliterm.CLIProxyServer`** が起動します。
-- このサーバーは、ホスト上の空きポートで TCP ソケットを Listen し、ランダムに生成したセキュアなワンタイムトークンと共に、ポート番号をホームディレクトリ（コンテナにマウントされている `/home/user` 直下）の `.eliterm-cli.port` ファイルに書き出します。
-- ゲストコンテナの起動時、コンテナ内の `/usr/local/bin/admin` にプロキシ用シェルスクリプトが自動的に配置されます。また、互換性のために `/usr/local/bin/eliterm` から `admin` へのシンボリックリンクが作成されます。
-- ゲスト内で `admin <args...>` が実行されると、スクリプトはコンテナ内からホストのゲートウェイ IP アドレスを解決し、`netcat (nc)` を用いてトークン、引数データ、および入出力をホストの TCP ポートへ送信します。
-- ホスト側では、トークン認証を通過した後に受信したコマンドを `Eliterm.CLI.main/1` に渡して実行し、その入出力（`IO.puts` / `IO.gets`）をカスタムの I/O サーバ（`Eliterm.IOServer`）を介して TCP ソケット経由でゲストの画面に流します。これによって、再初期化の確認ダイアログなどの双方向対話もゲスト内でそのまま動作します。
-
-#### 2. コマンド対応一覧
-ゲスト内の `admin` コマンドは、ホスト側の `eliterm` コマンドで提供されている全てのコマンドを実行可能です：
-- `admin cluster init` (クラスタ初期化・再初期化警告含む)
-- `admin cluster join <node> [--cookie <cookie>]` (クラスタ参加)
-- `admin cluster leave` (クラスタ離脱)
-- `admin cluster rename <prefix>` (ノード名変更)
-- `admin cluster info` (現在のノード名とクッキーの表示)
-- `admin list nodes` / `admin list sessions` / `admin list jobs` (一覧表示)
-- `admin job run <session_id> <job_name>` (ジョブ実行)
-
 ---
 
 ## 13. インストール設計
