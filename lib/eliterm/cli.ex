@@ -5,7 +5,7 @@ defmodule Eliterm.CLI do
   """
 
   def main(args) do
-    {opts, command, _} = OptionParser.parse(args, switches: [node: :string])
+    {opts, command, _} = OptionParser.parse(args, switches: [node: :string, cookie: :string])
 
     client_name = "cli_#{:rand.uniform(10000)}" |> String.to_atom()
     {:ok, _} = Node.start(client_name, :shortnames)
@@ -27,9 +27,13 @@ defmodule Eliterm.CLI do
       ["cluster", "init"] -> 
         execute_rpc(daemon_node, Eliterm.Cluster, :init, [])
       ["cluster", "join", target] -> 
-        execute_rpc(daemon_node, Eliterm.Cluster, :join, [target])
+        execute_rpc(daemon_node, Eliterm.Cluster, :join, [target, opts[:cookie]])
       ["cluster", "leave"] -> 
         execute_rpc(daemon_node, Eliterm.Cluster, :leave, [])
+      ["cluster", "rename", prefix] ->
+        execute_rpc(daemon_node, Eliterm.Cluster, :rename, [prefix])
+      ["cluster", "info"] ->
+        execute_rpc(daemon_node, Eliterm.Cluster, :info, [])
       ["list", "nodes"] -> 
         execute_rpc(daemon_node, Eliterm.Cluster, :list_nodes, [])
       ["list", "sessions"] -> 
@@ -86,8 +90,15 @@ defmodule Eliterm.CLI do
           IO.inspect(other, pretty: true)
       end
     else
-      IO.puts "Error: Eliterm daemon is not running on #{daemon_node}."
-      IO.puts "Make sure the daemon is started using 'mix run --no-halt' or via release daemon script."
+      if mod == Eliterm.Cluster and fun == :init do
+        IO.puts "Eliterm daemon is not running on #{daemon_node}."
+        IO.puts "Initializing cluster configuration locally on host OS..."
+        Eliterm.Cluster.init()
+        IO.puts "Success. Cluster configuration initialized locally."
+      else
+        IO.puts "Error: Eliterm daemon is not running on #{daemon_node}."
+        IO.puts "Make sure the daemon is started using 'mix run --no-halt' or via release daemon script."
+      end
     end
   end
 
@@ -97,8 +108,10 @@ defmodule Eliterm.CLI do
 
     Cluster:
       cluster init
-      cluster join <node>
+      cluster join <node> [--cookie <cookie>]
       cluster leave
+      cluster rename <prefix>
+      cluster info
       list nodes
 
     Sessions:

@@ -7,6 +7,27 @@ defmodule Eliterm.Application do
 
   @impl true
   def start(_type, _args) do
+    # Auto-initialize cluster (generate cookie if missing)
+    Eliterm.Cluster.init()
+
+    # Dynamically start distribution if not already running
+    unless Node.alive?() do
+      prefix = Eliterm.Config.get(["cluster", "node_prefix"], "eliterm")
+      {:ok, hostname} = :inet.gethostname()
+      short_host = to_string(hostname) |> String.split(".") |> List.first()
+      node_name = String.to_atom("#{prefix}@#{short_host}")
+      
+      case Node.start(node_name, :shortnames) do
+        {:ok, _} -> 
+          cookie_path = Path.join(Eliterm.base_dir(), "cookie")
+          if File.exists?(cookie_path) do
+            Node.set_cookie(String.to_atom(File.read!(cookie_path)))
+          end
+        {:error, reason} -> 
+          IO.puts(:stderr, "Failed to start Erlang distribution dynamically: #{inspect(reason)}")
+      end
+    end
+
     if Application.get_env(:eliterm, :check_dependencies, true) do
       Eliterm.DependencyChecker.check_and_halt_if_missing!()
     end

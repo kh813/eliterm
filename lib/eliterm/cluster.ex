@@ -27,8 +27,19 @@ defmodule Eliterm.Cluster do
     :ok
   end
 
-  def join(node_name) do
+  def join(node_name, cookie \\ nil) do
     node_atom = if is_binary(node_name), do: String.to_atom(node_name), else: node_name
+
+    if cookie do
+      cookie_atom = if is_binary(cookie), do: String.to_atom(cookie), else: cookie
+      Node.set_cookie(cookie_atom)
+
+      cookie_path = Path.join(Eliterm.base_dir(), "cookie")
+      File.write!(cookie_path, to_string(cookie))
+      File.chmod!(cookie_path, 0o600)
+      Logger.info("Persisted new cluster cookie from join command.")
+    end
+
     case Node.connect(node_atom) do
       true ->
         Logger.info("Successfully joined node: #{node_atom}")
@@ -48,6 +59,35 @@ defmodule Eliterm.Cluster do
       _ -> Logger.info("Left cluster")
     end
     :ok
+  end
+
+  def rename(new_prefix) when is_binary(new_prefix) do
+    Eliterm.Config.put(["cluster", "node_prefix"], new_prefix)
+    Logger.info("Saved new node prefix: #{new_prefix}")
+
+    if Node.alive?() do
+      Node.stop()
+
+      {:ok, hostname} = :inet.gethostname()
+      short_host = to_string(hostname) |> String.split(".") |> List.first()
+      node_name = String.to_atom("#{new_prefix}@#{short_host}")
+
+      case Node.start(node_name, :shortnames) do
+        {:ok, _} ->
+          cookie_path = Path.join(Eliterm.base_dir(), "cookie")
+          if File.exists?(cookie_path) do
+            Node.set_cookie(String.to_atom(File.read!(cookie_path)))
+          end
+          Logger.info("Dynamically renamed node and restarted distribution as #{node_name}")
+          {:ok, node_name}
+        {:error, reason} ->
+          Logger.error("Failed to restart distribution with new name: #{inspect(reason)}")
+          {:error, reason}
+      end
+    else
+      Logger.info("Node is not running in distributed mode. Node prefix saved to config.")
+      :ok
+    end
   end
 
   def list_nodes do
@@ -86,5 +126,14 @@ defmodule Eliterm.Cluster do
       :pang ->
         {:error, :pang}
     end
+  end
+
+  def info do
+    cookie_path = Path.join(Eliterm.base_dir(), "cookie")
+    cookie = if File.exists?(cookie_path), do: File.read!(cookie_path), else: "not_initialized"
+    %{
+      node: Node.self(),
+      cookie: cookie
+    }
   end
 end

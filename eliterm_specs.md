@@ -743,9 +743,11 @@ eliterm
 │   └── ping                 ノードへの疎通確認
 │
 └── cluster
-    ├── init                 クラスタを初期化（最初の1台）
-    ├── join                 クラスタに参加
-    └── leave                クラスタから離脱
+    ├── init                 クラスタを初期化（非起動時はローカル初期化）
+    ├── join                 クラスタに参加（--cookie オプション対応）
+    ├── leave                クラスタから離脱
+    ├── rename               ノード接頭辞の変更
+    └── info                 自ノードのノード名とクッキーの表示
 ```
 
 ### 11.2 コマンドリファレンス
@@ -839,13 +841,19 @@ eliterm node ping <node>
 
 ```bash
 eliterm cluster init
-  # クラスタを初期化（最初の1台で実行）
+  # クラスタを初期化（デーモン非起動時はローカルに直接クッキーを作成）
 
-eliterm cluster join <node>
-  # 既存クラスタに参加
+eliterm cluster join <node> [--cookie <cookie>]
+  # 既存クラスタに参加（--cookie 指定時はクッキーを設定ファイルに保存して動的適用）
 
 eliterm cluster leave
   # クラスタから離脱
+
+eliterm cluster rename <prefix>
+  # 実行中のノード接頭辞を動的に変更し、eliterm.tomlに保存して永続化
+
+eliterm cluster info
+  # 自身のノード名とクラスタクッキー情報を表示
 ```
 
 ### 11.3 出力例
