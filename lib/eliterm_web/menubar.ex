@@ -15,7 +15,13 @@ defmodule ElitermWeb.MenuBar do
 
   @impl true
   def handle_event("quit", menu) do
-    Eliterm.WindowWatcher.shutdown_app()
+    if should_confirm_quit?() do
+      if confirm_quit?() do
+        Eliterm.WindowWatcher.shutdown_app()
+      end
+    else
+      Eliterm.WindowWatcher.shutdown_app()
+    end
     {:noreply, menu}
   end
 
@@ -93,6 +99,30 @@ defmodule ElitermWeb.MenuBar do
 
   defp update_toml_font(font) do
     Eliterm.Config.put(["gui", "font"], font)
+  end
+
+  defp should_confirm_quit? do
+    Application.get_env(:eliterm, :start_gui, true) and
+      Code.ensure_loaded?(:wx) and
+      not :wx.is_null(:wx.null())
+  end
+
+  defp confirm_quit? do
+    msg = ~c"Elitermを終了してもよろしいですか？\n実行中のバックグラウンドセッションやcronジョブがすべて終了します。"
+    caption = ~c"終了の確認"
+    # wxYES_NO (10) bor wxICON_QUESTION (1024) bor wxNO_DEFAULT (128) = 1162
+    style = 1162
+
+    try do
+      dialog = :wxMessageDialog.new(:wx.null(), msg, [{:caption, caption}, {:style, style}])
+      result = :wxMessageDialog.showModal(dialog)
+      :wxMessageDialog.destroy(dialog)
+      result == 5103 # wxID_YES
+    rescue
+      e ->
+        Logger.error("Failed to show confirmation dialog: #{inspect(e)}")
+        true
+    end
   end
 
   @impl true
