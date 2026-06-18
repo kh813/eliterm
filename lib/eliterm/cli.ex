@@ -8,7 +8,14 @@ defmodule Eliterm.CLI do
     {opts, command, _} = OptionParser.parse(args, switches: [node: :string, cookie: :string])
 
     client_name = "cli_#{:rand.uniform(10000)}" |> String.to_atom()
-    {:ok, _} = Node.start(client_name, :shortnames)
+    case Node.start(client_name, :shortnames) do
+      {:ok, _} -> :ok
+      {:error, {:already_started, _}} -> :ok
+      {:error, reason} ->
+        unless Node.alive?() do
+          IO.puts(:stderr, "Failed to start Node: #{inspect(reason)}")
+        end
+    end
 
     cookie_path = Path.join([Eliterm.base_dir(), "cookie"])
     if File.exists?(cookie_path) do
