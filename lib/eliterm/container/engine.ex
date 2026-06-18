@@ -188,7 +188,11 @@ defmodule Eliterm.Container.Engine do
     TOKEN=$(tail -n 1 "$PORT_FILE")
 
     # Find the host gateway IP address
-    if command -v ip >/dev/null 2>&1; then
+    if grep -q "host.docker.internal" /etc/hosts; then
+      HOST_IP="host.docker.internal"
+    elif grep -q "host.containers.internal" /etc/hosts; then
+      HOST_IP="host.containers.internal"
+    elif command -v ip >/dev/null 2>&1; then
       HOST_IP=$(ip route show | awk '/default/ {print $3}')
     else
       HEX_GW=$(awk '$2=="00000000" {print $3}' /proc/net/route)
@@ -199,11 +203,11 @@ defmodule Eliterm.Container.Engine do
           0x$(echo "$HEX_GW" | cut -c 3-4) \\
           0x$(echo "$HEX_GW" | cut -c 1-2))
       else
-        HOST_IP="172.17.0.1"
+        HOST_IP="10.0.2.2"
       fi
     fi
 
-    (printf '%s\\n' "$TOKEN"; printf '%d\\n' "$#"; printf '%s\\0' "$@"; cat) | nc "$HOST_IP" "$PORT"
+    (printf '%s\\n' "$TOKEN"; printf '%d\\n' "$#"; printf '%s\\0' "$@"; cat) | nc -w 5 "$HOST_IP" "$PORT"
     """
 
     tmp_path = Path.join(home_dir, ".eliterm-proxy-tmp")
