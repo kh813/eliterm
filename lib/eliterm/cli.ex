@@ -25,7 +25,11 @@ defmodule Eliterm.CLI do
 
     case command do
       ["cluster", "init"] -> 
-        execute_rpc(daemon_node, Eliterm.Cluster, :init, [])
+        if confirm_reinit?() do
+          execute_rpc(daemon_node, Eliterm.Cluster, :init, [])
+        else
+          IO.puts "Aborted."
+        end
       ["cluster", "join", target] -> 
         execute_rpc(daemon_node, Eliterm.Cluster, :join, [target, opts[:cookie]])
       ["cluster", "leave"] -> 
@@ -131,5 +135,21 @@ defmodule Eliterm.CLI do
       app install <session_id> <pkg_name>
       app list <session_id>
     """
+  end
+
+  defp confirm_reinit? do
+    cookie_path = Path.join([Eliterm.base_dir(), "cookie"])
+    if File.exists?(cookie_path) do
+      IO.puts "Warning: Cluster is already initialized (cookie file exists)."
+      IO.puts "Re-initializing will generate a new cookie, which will disconnect this node from all other nodes in the cluster."
+      IO.write "Do you want to proceed? [y/N]: "
+      case IO.gets("") |> to_string() |> String.trim() |> String.downcase() do
+        "y" -> true
+        "yes" -> true
+        _ -> false
+      end
+    else
+      true
+    end
   end
 end
