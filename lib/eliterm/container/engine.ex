@@ -115,6 +115,8 @@ defmodule Eliterm.Container.Engine do
       # Try to start existing container first
       case System.cmd(bin, ["start", container_name]) do
         {_, 0} ->
+          # Ensure proxy script and netcat are present even when reusing container
+          ensure_proxy_installed(bin, container_name, home_dir)
           {:ok, container_name}
         _ ->
           # Container does not exist or failed to start, create a new one
@@ -153,8 +155,25 @@ defmodule Eliterm.Container.Engine do
     create_container_user(bin, container_name)
     System.cmd(bin, ["exec", container_name, "mkdir", "-p", "/home/user"])
 
-    # Install netcat-openbsd in container to allow socket communication
-    System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y", "netcat-openbsd"])
+    ensure_proxy_installed(bin, container_name, home_dir)
+    
+    apps_file = Path.join(home_dir, ".eliterm-apps")
+    if File.exists?(apps_file) do
+      Logger.info("Installing packages from .eliterm-apps for #{container_name}")
+      install_packages(bin, container_name, apps_file)
+    end
+  end
+
+  defp ensure_proxy_installed(bin, container_name, home_dir) do
+    # Check if netcat is already installed, if not install it
+    case System.cmd(bin, ["exec", container_name, "which", "nc"]) do
+      {_, 0} ->
+        :ok
+      _ ->
+        Logger.info("Installing netcat-openbsd inside container #{container_name}...")
+        System.cmd(bin, ["exec", container_name, "apt-get", "update"])
+        System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y", "netcat-openbsd"])
+    end
 
     # Write proxy script to host and copy it to container as 'admin' command
     proxy_script = """
@@ -176,12 +195,6 @@ defmodule Eliterm.Container.Engine do
     
     # Create symlink for 'eliterm' for compatibility
     System.cmd(bin, ["exec", container_name, "ln", "-sf", "/usr/local/bin/admin", "/usr/local/bin/eliterm"])
-    
-    apps_file = Path.join(home_dir, ".eliterm-apps")
-    if File.exists?(apps_file) do
-      Logger.info("Installing packages from .eliterm-apps for #{container_name}")
-      install_packages(bin, container_name, apps_file)
-    end
   end
 
   defp create_container_user(bin, container_name) do
