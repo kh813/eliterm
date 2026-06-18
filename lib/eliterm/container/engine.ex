@@ -178,12 +178,32 @@ defmodule Eliterm.Container.Engine do
     # Write proxy script to host and copy it to container as 'admin' command
     proxy_script = """
     #!/bin/sh
-    SOCKET_PATH="/home/user/.eliterm-cli.sock"
-    if [ ! -S "$SOCKET_PATH" ]; then
-      echo "Error: Eliterm CLI socket not found. Make sure you are inside an active Eliterm session." >&2
+    PORT_FILE="/home/user/.eliterm-cli.port"
+    if [ ! -f "$PORT_FILE" ]; then
+      echo "Error: Eliterm CLI port file not found. Make sure you are inside an active Eliterm session." >&2
       exit 1
     fi
-    (printf '%d\\n' "$#"; printf '%s\\0' "$@"; cat) | nc -U "$SOCKET_PATH"
+
+    PORT=$(head -n 1 "$PORT_FILE")
+    TOKEN=$(tail -n 1 "$PORT_FILE")
+
+    # Find the host gateway IP address
+    if command -v ip >/dev/null 2>&1; then
+      HOST_IP=$(ip route show | awk '/default/ {print $3}')
+    else
+      HEX_GW=$(awk '$2=="00000000" {print $3}' /proc/net/route)
+      if [ -n "$HEX_GW" ]; then
+        HOST_IP=$(printf "%d.%d.%d.%d" \\
+          0x$(echo "$HEX_GW" | cut -c 7-8) \\
+          0x$(echo "$HEX_GW" | cut -c 5-6) \\
+          0x$(echo "$HEX_GW" | cut -c 3-4) \\
+          0x$(echo "$HEX_GW" | cut -c 1-2))
+      else
+        HOST_IP="172.17.0.1"
+      fi
+    fi
+
+    (printf '%s\\n' "$TOKEN"; printf '%d\\n' "$#"; printf '%s\\0' "$@"; cat) | nc "$HOST_IP" "$PORT"
     """
 
     tmp_path = Path.join(home_dir, ".eliterm-proxy-tmp")
