@@ -841,7 +841,7 @@ eliterm node ping <node>
 
 ```bash
 eliterm cluster init
-  # クラスタを初期化（デーモン非起動時はローカルに直接クッキーを作成）
+  # クラスタを初期化（デーモン非起動時はローカルに直接クッキーを作成、既存クッキーあり時は再初期化確認プロンプトを表示）
 
 eliterm cluster join <node> [--cookie <cookie>]
   # 既存クラスタに参加（--cookie 指定時はクッキーを設定ファイルに保存して動的適用）
