@@ -59,21 +59,52 @@ cd eliterm-main
 
 ## 初期セットアップ（クラスタの構築）
 
-Eliterm は複数台の端末間（自分のPCとサーバーなど）でクラスタを組むことで真価を発揮します。
+Eliterm は複数台の端末間（自分のPCとサーバーなど）でクラスタを組むことで真価を発揮します。クラスタ間は Erlang 分散通信の仕組みを用い、共通の「Cookie（認証キー）」と固有の「ノード名」で相互接続します。
 
-### 1台目（例: サーバー側）
-最初のノードでクラスタを初期化します。
-```bash
-bin/eliterm cluster init
-```
-これにより認証用の Cookie が生成され、待ち受け状態になります。
+### Step 1: 1台目（例: サーバー側）での初期化と確認
 
-### 2台目（例: 手元のノートPC側）
-1台目のサーバーに向けて参加リクエストを送ります。
+1. **クラスタを初期化します**
+   ```bash
+   bin/eliterm cluster init
+   ```
+   これにより、クラスタ接続用のランダムな Cookie が生成され、ノードが起動します。すでに初期化済みの場合は、本当に再初期化するかを確認するプロンプトが表示されます。
+
+2. **接続情報を確認します**
+   ```bash
+   bin/eliterm cluster info
+   ```
+   出力例：
+   ```
+   Node: eliterm@server-host
+   Cookie: AVERYSECRETRANDOMCOOKIEVALUE...
+   ```
+   ここに表示される `Node` 名（例: `eliterm@server-host`）と `Cookie` の値を、2台目の接続の際に使用します。
+
+### Step 2: 2台目（例: 手元のノートPC側）での参加
+
+2台目のPCから、1台目のサーバーに向けて Cookie を指定して参加リクエストを送ります。
+
 ```bash
-bin/eliterm cluster join eliterm@<サーバーのIPアドレスやホスト名>
+bin/eliterm cluster join <1台目のNode名> --cookie <1台目のCookie値>
 ```
-これでノード同士が繋がり、マイグレーションの準備が完了しました！
+
+**実行例:**
+```bash
+bin/eliterm cluster join eliterm@server-host --cookie AVERYSECRETRANDOMCOOKIEVALUE...
+```
+これにより、2台目のPCにも同じ Cookie が永続化され、自動的にクラスタへ参加します。
+
+### (オプション) ノード名の変更
+デフォルトではノード名は `eliterm@<ホスト名>` となります。もし変更したい場合は、以下のコマンドで接頭辞を変更できます。
+
+```bash
+bin/eliterm cluster rename <新しい接頭辞>
+```
+**実行例:**
+```bash
+bin/eliterm cluster rename mylaptop
+# ノード名が mylaptop@<ホスト名> に変更されます
+```
 
 ---
 
