@@ -156,7 +156,7 @@ defmodule Eliterm.Container.Engine do
     # Install netcat-openbsd in container to allow socket communication
     System.cmd(bin, ["exec", container_name, "apt-get", "install", "-y", "netcat-openbsd"])
 
-    # Write proxy script to host and copy it to container
+    # Write proxy script to host and copy it to container as 'admin' command
     proxy_script = """
     #!/bin/sh
     SOCKET_PATH="/home/user/.eliterm-cli.sock"
@@ -169,10 +169,13 @@ defmodule Eliterm.Container.Engine do
 
     tmp_path = Path.join(home_dir, ".eliterm-proxy-tmp")
     File.write!(tmp_path, proxy_script)
-    System.cmd(bin, ["cp", tmp_path, "#{container_name}:/usr/local/bin/eliterm"])
+    System.cmd(bin, ["cp", tmp_path, "#{container_name}:/usr/local/bin/admin"])
     File.rm!(tmp_path)
 
-    System.cmd(bin, ["exec", container_name, "chmod", "+x", "/usr/local/bin/eliterm"])
+    System.cmd(bin, ["exec", container_name, "chmod", "+x", "/usr/local/bin/admin"])
+    
+    # Create symlink for 'eliterm' for compatibility
+    System.cmd(bin, ["exec", container_name, "ln", "-sf", "/usr/local/bin/admin", "/usr/local/bin/eliterm"])
     
     apps_file = Path.join(home_dir, ".eliterm-apps")
     if File.exists?(apps_file) do
