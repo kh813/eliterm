@@ -132,11 +132,13 @@ defmodule ElitermWeb.MenuBar do
 
     ~H"""
     <menubar>
-      <menu label="Eliterm">
-        <item onclick="new_terminal"><%= "New Terminal\t#{@cmd_key}+N" %></item>
-        <hr/>
-        <item onclick="quit"><%= "Quit\t#{@cmd_key}+Q" %></item>
-      </menu>
+      <%= if not match?({:unix, :darwin}, :os.type()) do %>
+        <menu label="Eliterm">
+          <item onclick="new_terminal"><%= "New Terminal\t#{@cmd_key}+N" %></item>
+          <hr/>
+          <item onclick="quit"><%= "Quit\t#{@cmd_key}+Q" %></item>
+        </menu>
+      <% end %>
       <menu label="Edit">
         <item onclick="copy"><%= "Copy (Cmd+C)" %></item>
         <item onclick="paste"><%= "Paste (Cmd+V)" %></item>
