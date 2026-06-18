@@ -50,6 +50,83 @@ defmodule ElitermWeb.MenuBar do
     {:noreply, menu}
   end
 
+  def handle_event("cluster_info", menu) do
+    info = Eliterm.Cluster.info()
+    msg = ~c"Node: #{info.node}\nCookie: #{info.cookie}"
+    caption = ~c"Cluster Info"
+    show_message_dialog(msg, caption, 1024) # wxICON_INFORMATION
+    {:noreply, menu}
+  end
+
+  def handle_event("cluster_init", menu) do
+    cookie_path = Path.join([Eliterm.base_dir(), "cookie"])
+    if File.exists?(cookie_path) do
+      msg = ~c"Warning: Cluster is already initialized.\nRe-initializing will generate a new cookie, which will disconnect this node from all other nodes.\n\nDo you want to proceed?"
+      caption = ~c"Re-initialize Cluster?"
+      style = 1162 # wxYES_NO | wxICON_QUESTION | wxNO_DEFAULT
+      
+      if show_confirm_dialog(msg, caption, style) do
+        Eliterm.Cluster.init()
+        show_message_dialog(~c"Cluster initialized successfully.", ~c"Success", 1024)
+      end
+    else
+      Eliterm.Cluster.init()
+      show_message_dialog(~c"Cluster initialized successfully.", ~c"Success", 1024)
+    end
+    {:noreply, menu}
+  end
+
+  def handle_event("cluster_rename", menu) do
+    current_prefix = Eliterm.Config.get(["cluster", "node_prefix"], "eliterm")
+    case show_text_entry_dialog(~c"Enter new node prefix:", ~c"Rename Node", to_charlist(current_prefix)) do
+      {:ok, new_prefix} ->
+        case Eliterm.Cluster.rename(new_prefix) do
+          {:ok, new_name} ->
+            show_message_dialog(~c"Node renamed successfully.\nNew Node Name: #{new_name}", ~c"Success", 1024)
+          :ok ->
+            show_message_dialog(~c"Node prefix updated. (Distribution not active)", ~c"Success", 1024)
+          {:error, reason} ->
+            show_message_dialog(~c"Error renaming node: #{inspect(reason)}", ~c"Error", 256)
+        end
+      :cancel ->
+        :ok
+    end
+    {:noreply, menu}
+  end
+
+  def handle_event("cluster_join", menu) do
+    case show_text_entry_dialog(~c"Enter target node to join (e.g. eliterm@hostname):", ~c"Join Cluster", ~c"") do
+      {:ok, target_node} ->
+        case show_text_entry_dialog(~c"Enter cluster cookie (leave empty to use current cookie):", ~c"Join Cluster - Cookie", ~c"") do
+          {:ok, cookie} ->
+            cookie_arg = if cookie == "", do: nil, else: cookie
+            case Eliterm.Cluster.join(target_node, cookie_arg) do
+              :ok ->
+                show_message_dialog(~c"Successfully joined cluster.", ~c"Success", 1024)
+              {:error, reason} ->
+                show_message_dialog(~c"Failed to join cluster: #{inspect(reason)}", ~c"Error", 256)
+            end
+          :cancel ->
+            :ok
+        end
+      :cancel ->
+        :ok
+    end
+    {:noreply, menu}
+  end
+
+  def handle_event("cluster_leave", menu) do
+    msg = ~c"Are you sure you want to leave the cluster?\nThis will stop Erlang distribution and delete the cookie."
+    caption = ~c"Leave Cluster?"
+    style = 1162 # wxYES_NO | wxICON_QUESTION | wxNO_DEFAULT
+    
+    if show_confirm_dialog(msg, caption, style) do
+      Eliterm.Cluster.leave()
+      show_message_dialog(~c"Successfully left the cluster.", ~c"Success", 1024)
+    end
+    {:noreply, menu}
+  end
+
   def handle_event("set_theme_" <> theme, menu) do
     colors = case theme do
       "default" -> %{}
@@ -125,6 +202,46 @@ defmodule ElitermWeb.MenuBar do
     end
   end
 
+  defp show_message_dialog(msg, caption, style) do
+    try do
+      dialog = :wxMessageDialog.new(:wx.null(), msg, [{:caption, caption}, {:style, style}])
+      :wxMessageDialog.showModal(dialog)
+      :wxMessageDialog.destroy(dialog)
+    rescue
+      e -> Logger.error("Failed to show message dialog: #{inspect(e)}")
+    end
+  end
+
+  defp show_confirm_dialog(msg, caption, style) do
+    try do
+      dialog = :wxMessageDialog.new(:wx.null(), msg, [{:caption, caption}, {:style, style}])
+      result = :wxMessageDialog.showModal(dialog)
+      :wxMessageDialog.destroy(dialog)
+      result == 5103 # wxID_YES
+    rescue
+      _ -> true
+    end
+  end
+
+  defp show_text_entry_dialog(msg, caption, default_value) do
+    try do
+      dialog = :wxTextEntryDialog.new(:wx.null(), msg, [{:caption, caption}, {:value, default_value}])
+      result = :wxTextEntryDialog.showModal(dialog)
+      value = :wxTextEntryDialog.getValue(dialog)
+      :wxTextEntryDialog.destroy(dialog)
+      
+      if result == 5100 do # wxID_OK
+        {:ok, to_string(value)}
+      else
+        :cancel
+      end
+    rescue
+      e ->
+        Logger.error("Failed to show text entry dialog: #{inspect(e)}")
+        :cancel
+    end
+  end
+
   @impl true
   def render(assigns) do
     cmd_key = if match?({:unix, :darwin}, :os.type()), do: "Cmd", else: "Ctrl"
@@ -142,6 +259,14 @@ defmodule ElitermWeb.MenuBar do
       <menu label="Edit">
         <item onclick="copy"><%= "Copy (Cmd+C)" %></item>
         <item onclick="paste"><%= "Paste (Cmd+V)" %></item>
+      </menu>
+      <menu label="Cluster">
+        <item onclick="cluster_info">Cluster Info</item>
+        <hr/>
+        <item onclick="cluster_init">Initialize Cluster</item>
+        <item onclick="cluster_join">Join Cluster...</item>
+        <item onclick="cluster_leave">Leave Cluster</item>
+        <item onclick="cluster_rename">Rename Node...</item>
       </menu>
       <menu label="View">
         <menu label="Font">
