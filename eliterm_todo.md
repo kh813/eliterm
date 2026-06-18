@@ -252,6 +252,7 @@ Version 0.1 / 仕様書 v0.8 対応
 - [x] `eliterm cluster rename <prefix>` の実装：動作中にノード名接頭辞を動的変更し、設定ファイルに保存
 - [x] `eliterm cluster info` の実装：ノード名とクッキーの現在値を表示
 - [x] `eliterm cluster init` 実行時に既に初期化済みの場合の確認プロンプト（re-init確認）の実装
+- [x] GUIメニューバーへの「Cluster」メニューの追加：クラスタ情報の表示、初期化、参加、離脱、ノード名変更をGUIダイアログ経由で実行可能に実装
 
 ---
 
