@@ -7,14 +7,10 @@ defmodule Eliterm.Application do
 
   @impl true
   def start(_type, _args) do
-    # Auto-initialize cluster (generate cookie if missing)
-    Eliterm.Cluster.init()
-
     # Dynamically start distribution if not already running
     unless Node.alive?() do
       prefix = Eliterm.Config.get(["cluster", "node_prefix"], "eliterm")
-      {:ok, hostname} = :inet.gethostname()
-      short_host = to_string(hostname) |> String.split(".") |> List.first()
+      short_host = Eliterm.local_host()
       node_name = String.to_atom("#{prefix}@#{short_host}")
       
       case Node.start(node_name, :shortnames) do
@@ -36,7 +32,13 @@ defmodule Eliterm.Application do
     
     endpoint_config = Application.get_env(:eliterm, ElitermWeb.Endpoint)
     http_opts = Keyword.get(endpoint_config, :http, []) |> Keyword.put(:port, port)
+    http_opts = if System.get_env("ELITERM_HEADLESS") == "true" do
+      Keyword.put(http_opts, :ip, {0, 0, 0, 0})
+    else
+      Keyword.put_new(http_opts, :ip, {127, 0, 0, 1})
+    end
     Application.put_env(:eliterm, ElitermWeb.Endpoint, Keyword.put(endpoint_config, :http, http_opts))
+
 
     ports = [45892, 45893, 45894, 45895]
     topologies = Enum.reduce(ports, [], fn port, acc ->
@@ -84,9 +86,15 @@ defmodule Eliterm.Application do
       {Horde.DynamicSupervisor, [name: Eliterm.DistributedSupervisor, strategy: :one_for_one, members: :auto]},
       Eliterm.ClusterManager,
       Eliterm.SessionSupervisor,
-      Eliterm.DataSync,
-      Eliterm.Clipboard
+      Eliterm.DataSync
     ]
+
+    children =
+      if Application.get_env(:eliterm, :start_gui, true) do
+        children ++ [Eliterm.Clipboard]
+      else
+        children
+      end
 
     children =
       if Application.get_env(:eliterm, :start_sleep_watcher, true) do

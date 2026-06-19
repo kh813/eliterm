@@ -17,6 +17,20 @@ defmodule Eliterm do
     end
   end
 
+  def local_host do
+    case :inet.gethostname() do
+      {:ok, hostname} ->
+        host_str = to_string(hostname)
+        short_host = host_str |> String.split(".") |> List.first()
+        case :inet.getaddr(to_charlist(short_host), :inet) do
+          {:ok, _} -> short_host
+          _ -> "localhost"
+        end
+      _ ->
+        "localhost"
+    end
+  end
+
   def start_session(session_id, opts \\ []) do
     Horde.DynamicSupervisor.start_child(
       Eliterm.DistributedSupervisor,

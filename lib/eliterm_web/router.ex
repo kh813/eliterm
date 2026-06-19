@@ -10,9 +10,19 @@ defmodule ElitermWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :api do
+    plug :accepts, ["json"]
+  end
+
   scope "/", ElitermWeb do
     pipe_through :browser
 
     live "/", TerminalLive
+  end
+
+  scope "/api", ElitermWeb do
+    pipe_through :api
+
+    post "/cluster/join", ClusterController, :join_request
   end
 end

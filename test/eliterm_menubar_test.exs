@@ -21,4 +21,46 @@ defmodule ElitermMenuBarTest do
       assert html =~ "Consolas"
     end
   end
+
+  test "render/1 returns menu options based on cluster initialization and roles" do
+    # 1. Not initialized
+    assigns = %{initialized: false, role: "primary"}
+    html = rendered_to_string(MenuBar.render(assigns))
+    assert html =~ "Initialize Cluster"
+    assert html =~ "Join Cluster..."
+    refute html =~ "Cluster Info"
+    refute html =~ "Rename Node..."
+    refute html =~ "Reset Cluster"
+    refute html =~ "Leave Cluster"
+
+    # 2. Initialized as primary
+    assigns = %{initialized: true, role: "primary"}
+    html = rendered_to_string(MenuBar.render(assigns))
+    refute html =~ "Initialize Cluster"
+    refute html =~ "Join Cluster..."
+    assert html =~ "Cluster Info"
+    assert html =~ "Rename Node..."
+    assert html =~ "Reset Cluster"
+    refute html =~ "Leave Cluster"
+
+    # 3. Initialized as secondary
+    assigns = %{initialized: true, role: "secondary"}
+    html = rendered_to_string(MenuBar.render(assigns))
+    refute html =~ "Initialize Cluster"
+    refute html =~ "Join Cluster..."
+    assert html =~ "Cluster Info"
+    refute html =~ "Rename Node..."
+    refute html =~ "Reset Cluster"
+    assert html =~ "Leave Cluster"
+
+    # 4. Initialized as member
+    assigns = %{initialized: true, role: "member"}
+    html = rendered_to_string(MenuBar.render(assigns))
+    refute html =~ "Initialize Cluster"
+    refute html =~ "Join Cluster..."
+    assert html =~ "Cluster Info"
+    refute html =~ "Rename Node..."
+    refute html =~ "Reset Cluster"
+    assert html =~ "Leave Cluster"
+  end
 end

@@ -1,6 +1,19 @@
 #!/bin/bash
 set -e
 
+# Setup isolated data directory
+export ELITERM_DATA_DIR="$(pwd)/.eliterm_test_e2e"
+rm -rf "$ELITERM_DATA_DIR"
+mkdir -p "$ELITERM_DATA_DIR"
+
+cleanup() {
+  echo "Cleaning up nodes..."
+  kill $NODE1_PID >/dev/null 2>&1 || true
+  kill $NODE2_PID >/dev/null 2>&1 || true
+  rm -rf "$ELITERM_DATA_DIR" node1.log node2.log
+}
+trap cleanup EXIT
+
 # Compile latest
 mix compile
 mix escript.build
@@ -13,7 +26,7 @@ NODE1_PID=$!
 elixir --sname node2 -S mix run --no-halt > node2.log 2>&1 &
 NODE2_PID=$!
 
-sleep 3
+sleep 4
 
 HOST=$(hostname -s)
 CLI="bin/eliterm"
@@ -32,8 +45,5 @@ sleep 2
 echo "=== Sessions on node2 ==="
 $CLI --node node2@$HOST list sessions
 
-# Cleanup
-kill $NODE1_PID
-kill $NODE2_PID
-
 echo "E2E Test Completed!"
+

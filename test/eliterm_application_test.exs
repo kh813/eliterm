@@ -8,9 +8,11 @@ defmodule ElitermApplicationTest do
     refute Application.get_env(:eliterm, :check_dependencies)
 
     # Verify that these GUI-related processes are not running
+    # (wxWidgets/X11 initialization will crash if started in headless CI environment)
     assert Process.whereis(ElitermWindow) == nil
     assert Process.whereis(Eliterm.WindowWatcher) == nil
     assert Process.whereis(Eliterm.SleepWatcher) == nil
+    assert Process.whereis(Eliterm.Clipboard) == nil
   end
 
   test "core processes are running in test environment" do

@@ -5,6 +5,22 @@ defmodule Eliterm.ClusterManager do
   use GenServer
   require Logger
 
+  def start_invite do
+    GenServer.call(__MODULE__, :start_invite)
+  end
+
+  def cancel_invite do
+    GenServer.call(__MODULE__, :cancel_invite)
+  end
+
+  def verify_and_use_token(token, public_key_der) do
+    GenServer.call(__MODULE__, {:verify_and_use_token, token, public_key_der})
+  end
+
+  def get_invite_status do
+    GenServer.call(__MODULE__, :get_invite_status)
+  end
+
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
@@ -12,7 +28,7 @@ defmodule Eliterm.ClusterManager do
   @impl true
   def init(_opts) do
     Logger.info("Starting Eliterm.ClusterManager...")
-    {:ok, %{}}
+    {:ok, %{invite_token: nil, timer: nil, expires_at: nil, cookie: nil}}
   end
 
   def migrate_session(session_id, target_node) do
@@ -84,5 +100,76 @@ defmodule Eliterm.ClusterManager do
         Eliterm.DataSync.set_readonly(home_dir, false)
         Eliterm.start_session(session_id)
     end
+  end
+
+  @impl true
+  def handle_call(:start_invite, _from, state) do
+    if state.timer, do: Process.cancel_timer(state.timer)
+
+    # 100-100 to 999-999 (random token)
+    token = "#{:rand.uniform(900) + 99}-#{:rand.uniform(900) + 99}"
+    
+    # 5 minutes timer
+    timer = Process.send_after(self(), {:invite_timeout, token}, 300_000)
+    expires_at = DateTime.utc_now() |> DateTime.add(300, :second) |> DateTime.to_unix()
+
+    cookie_path = Path.join(Eliterm.base_dir(), "cookie")
+    cookie = if File.exists?(cookie_path), do: File.read!(cookie_path), else: ""
+
+    new_state = %{state | invite_token: token, timer: timer, expires_at: expires_at, cookie: cookie}
+    Logger.info("Cluster invite mode started. Token: #{token}")
+    {:reply, {:ok, token, expires_at}, new_state}
+  end
+
+  def handle_call(:cancel_invite, _from, state) do
+    if state.timer, do: Process.cancel_timer(state.timer)
+    
+    new_state = %{state | invite_token: nil, timer: nil, expires_at: nil, cookie: nil}
+    Logger.info("Cluster invite mode canceled.")
+    {:reply, :ok, new_state}
+  end
+
+  def handle_call({:verify_and_use_token, token, public_key_der}, _from, state) do
+    cond do
+      is_nil(state.invite_token) ->
+        {:reply, {:error, :no_active_invite}, state}
+
+      state.invite_token != token ->
+        {:reply, {:error, :invalid_token}, state}
+
+      true ->
+        if state.timer, do: Process.cancel_timer(state.timer)
+
+        cookie = state.cookie || ""
+        
+        case Eliterm.Crypto.encrypt_cookie(cookie, public_key_der) do
+          encrypted_cookie ->
+            new_state = %{state | invite_token: nil, timer: nil, expires_at: nil, cookie: nil}
+            Logger.info("Invite token #{token} verified and consumed.")
+            {:reply, {:ok, encrypted_cookie}, new_state}
+        end
+    end
+  end
+
+  def handle_call(:get_invite_status, _from, state) do
+    if state.invite_token do
+      {:reply, %{token: state.invite_token, expires_at: state.expires_at}, state}
+    else
+      {:reply, nil, state}
+    end
+  end
+
+  @impl true
+  def handle_info({:invite_timeout, token}, state) do
+    if state.invite_token == token do
+      Logger.info("Invite token #{token} expired.")
+      {:noreply, %{state | invite_token: nil, timer: nil, expires_at: nil, cookie: nil}}
+    else
+      {:noreply, state}
+    end
+  end
+
+  def handle_info(_msg, state) do
+    {:noreply, state}
   end
 end

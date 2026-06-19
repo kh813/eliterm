@@ -1,7 +1,5 @@
 defmodule ElitermWeb.TerminalLiveTest do
   use ExUnit.Case
-  import Phoenix.LiveViewTest
-  @endpoint ElitermWeb.Endpoint
 
   setup do
     ElitermWeb.Endpoint.start_link()

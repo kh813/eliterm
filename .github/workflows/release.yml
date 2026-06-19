@@ -23,6 +23,8 @@ jobs:
           mix deps.get
           mix deps.compile
       - name: Run tests and check compilation
+        env:
+          ELITERM_HEADLESS: "true"
         run: |
           mix compile
           mix test

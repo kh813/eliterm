@@ -4,7 +4,7 @@ defmodule Eliterm.MixProject do
   def project do
     [
       app: :eliterm,
-      version: "0.1.24",
+      version: "0.1.25",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -43,7 +43,7 @@ defmodule Eliterm.MixProject do
       {:phoenix_live_view, "~> 0.19.0"},
       {:phoenix_html, "~> 3.3"},
       {:bandit, "~> 1.0"},
-      {:desktop, "~> 1.5"},
+      {:desktop, "~> 1.5", runtime: System.get_env("ELITERM_HEADLESS") != "true"},
       {:toml, "~> 0.7"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
